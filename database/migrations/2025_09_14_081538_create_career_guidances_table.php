@@ -11,11 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('admins', function (Blueprint $table) {
+        Schema::create('career_guidances', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('password');
+            $table->foreignId('admin_id')->nullable()->constrained('admins')->cascadeOnDelete();
+
+            $table->string('title');
+            $table->string('type')->nullable();
+            $table->string('content_path');
+            $table->string('format')->nullable();
+
             $table->timestamps();
         });
     }
@@ -26,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('admins');
+        Schema::dropIfExists('career_guidances');
     }
 };
