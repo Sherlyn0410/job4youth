@@ -13,25 +13,25 @@
                 </p>
 
                 <!-- Search bar -->
-                <form class="mt-8" action="#" role="search" aria-label="Job search">
-                <div class="flex flex-col gap-3 rounded-xl bg-white p-2 shadow-sm ring-1 ring-gray-200 md:flex-row">
-                    <label class="relative flex-1">
-                    <span class="sr-only">Keywords</span>
-                    <input type="text" placeholder="Job title, Keyword…" 
-                        class="w-full rounded-lg border-0 pl-3 pr-3 py-3 outline-none focus:ring-2 focus:ring-blue-500" />
-                    </label>
+                <form class="mt-8" action="{{ route('jobs.index') }}" method="GET" role="search" aria-label="Job search">
+                    <div class="flex flex-col gap-3 rounded-xl bg-white p-2 shadow-sm ring-1 ring-gray-200 md:flex-row">
+                        <label class="relative flex-1">
+                        <span class="sr-only">Keywords</span>
+                        <input type="text" name="search" placeholder="Job title, Keyword…" 
+                            class="w-full rounded-lg border-0 pl-3 pr-3 py-3 outline-none focus:ring-2 focus:ring-blue-500" />
+                        </label>
 
-                    <label class="relative flex-1">
-                    <span class="sr-only">Location</span>
-                    <input type="text" placeholder="Your Location" 
-                        class="w-full rounded-lg border-0 pl-3 pr-3 py-3 outline-none focus:ring-2 focus:ring-blue-500" />
-                    </label>
+                        <label class="relative flex-1">
+                        <span class="sr-only">Location</span>
+                        <input type="text" name="location" placeholder="Your Location" 
+                            class="w-full rounded-lg border-0 pl-3 pr-3 py-3 outline-none focus:ring-2 focus:ring-blue-500" />
+                        </label>
 
-                    <button type="submit" 
-                    class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    Find Job
-                    </button>
-                </div>
+                        <button type="submit" 
+                        class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        Find Job
+                        </button>
+                    </div>
                 </form>
             </div>
 
@@ -48,63 +48,63 @@
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="mb-8 flex items-center justify-between">
         <h2 class="text-2xl font-bold">Trending Job Categories</h2>
-        <a href="#" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+        <a href="{{ route('jobs.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
             View More →
         </a>
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <!-- Example card -->
-        <a href="#" class="group rounded-xl bg-white p-4 ring-1 ring-gray-200 transition hover:shadow-md">
+        <a href="{{ route('jobs.index', ['specialization' => 'Fresh Graduate']) }}" class="group rounded-xl bg-white p-4 ring-1 ring-gray-200 transition hover:shadow-md">
             <div>
             <p class="font-medium text-gray-900">Fresh Graduate Jobs</p>
             <p class="text-sm text-gray-500">357 Open position</p>
             </div>
         </a>
 
-        <a href="#" class="group rounded-xl bg-white p-4 ring-1 ring-gray-200 transition hover:shadow-md">
+        <a href="{{ route('jobs.index', ['specialization' => 'Internships']) }}" class="group rounded-xl bg-white p-4 ring-1 ring-gray-200 transition hover:shadow-md">
             <div>
             <p class="font-medium text-gray-900">Internships</p>
             <p class="text-sm text-gray-500">312 Open position</p>
             </div>
         </a>
 
-        <a href="#" class="group rounded-xl bg-white p-4 ring-1 ring-gray-200 transition hover:shadow-md">
+        <a href="{{ route('jobs.index', ['specialization' => 'Graduate Trainee Programs']) }}" class="group rounded-xl bg-white p-4 ring-1 ring-gray-200 transition hover:shadow-md">
             <div>
             <p class="font-medium text-gray-900">Graduate Trainee Programs</p>
             <p class="text-sm text-gray-500">297 Open position</p>
             </div>
         </a>
 
-        <a href="#" class="group rounded-xl bg-white p-4 ring-1 ring-gray-200 transition hover:shadow-md">
+        <a href="{{ route('jobs.index', ['specialization' => 'Part-Time Jobs']) }}" class="group rounded-xl bg-white p-4 ring-1 ring-gray-200 transition hover:shadow-md">
             <div>
             <p class="font-medium text-gray-900">Part-Time Jobs</p>
             <p class="text-sm text-gray-500">247 Open position</p>
             </div>
         </a>
 
-        <a href="#" class="group rounded-xl bg-white p-4 ring-1 ring-gray-200 transition hover:shadow-md">
+        <a href="{{ route('jobs.index', ['specialization' => 'Information Technology']) }}" class="group rounded-xl bg-white p-4 ring-1 ring-gray-200 transition hover:shadow-md">
             <div>
             <p class="font-medium text-gray-900">Information Technology</p>
             <p class="text-sm text-gray-500">357 Open position</p>
             </div>
         </a>
 
-        <a href="#" class="group rounded-xl bg-white p-4 ring-1 ring-gray-200 transition hover:shadow-md">
+        <a href="{{ route('jobs.index', ['specialization' => 'Sales & Marketing']) }}" class="group rounded-xl bg-white p-4 ring-1 ring-gray-200 transition hover:shadow-md">
             <div>
             <p class="font-medium text-gray-900">Sales &amp; Marketing</p>
             <p class="text-sm text-gray-500">312 Open position</p>
             </div>
         </a>
 
-        <a href="#" class="group rounded-xl bg-white p-4 ring-1 ring-gray-200 transition hover:shadow-md">
+        <a href="{{ route('jobs.index', ['specialization' => 'Video Editing']) }}" class="group rounded-xl bg-white p-4 ring-1 ring-gray-200 transition hover:shadow-md">
             <div>
             <p class="font-medium text-gray-900">Video Editing</p>
             <p class="text-sm text-gray-500">297 Open position</p>
             </div>
         </a>
 
-        <a href="#" class="group rounded-xl bg-white p-4 ring-2 ring-blue-100 shadow-sm transition hover:shadow-md">
+        <a href="{{ route('jobs.index', ['specialization' => 'HR & Recruitment Assistant']) }}" class="group rounded-xl bg-white p-4 ring-2 ring-blue-100 shadow-sm transition hover:shadow-md">
             <div>
             <p class="font-medium text-gray-900">HR &amp; Recruitment Assistant</p>
             <p class="text-sm text-gray-500">57 Open position</p>

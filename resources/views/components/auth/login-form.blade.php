@@ -7,7 +7,7 @@
     <!-- Header with Logo and Close Button -->
     <div class="flex items-start justify-between p-6 pb-4">
         <div class="flex flex-col">
-            <img src="{{ asset('/assets/img/Job4Youth.png') }}" alt="Job4Youth" class="h-5 w-auto mb-2">
+            <x-application-logo class="block h-5 w-auto" />
         </div>
         <button @click="$dispatch('close-modal', 'login')" class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <span class="sr-only">Close</span>
@@ -137,4 +137,15 @@
             </p>
         </div>
     </div>
+
+    <script>
+        // Listen for successful form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if login was successful (you can customize this based on your login flow)
+            @if(session('login_success') || auth()->check())
+                // Dispatch login success event
+                document.dispatchEvent(new Event('login-success'));
+            @endif
+        });
+    </script>
 </div>

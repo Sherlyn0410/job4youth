@@ -45,4 +45,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function applications()
+    {
+        return $this->hasMany(Application::class);
+    }
+
+    // Helper method to check if user has applied for a job
+    public function hasAppliedFor($jobId)
+    {
+        return $this->applications()->where('job_post_id', $jobId)->exists();
+    }
 }

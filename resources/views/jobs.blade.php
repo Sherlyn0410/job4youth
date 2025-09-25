@@ -1,322 +1,677 @@
 <x-public-layout>
-    <section class="w-full bg-[#006EDC]">
-        <div class="max-w-6xl mx-auto px-4 py-6">
-            <div class="grid grid-cols-1 md:grid-cols-[1fr_320px_auto] gap-3">
+    <!-- SEARCH SECTION -->
+    <section class="sticky top-16 z-40 w-full bg-blue-600">
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <form method="GET" action="{{ route('jobs.index') }}" class="space-y-4">
+                <div class="grid grid-cols-12 gap-4">
+                    
+                    <!-- Job Title/Keywords Search -->
+                    <div class="col-span-12 md:col-span-5 relative">
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ request('search') }}"
+                            placeholder="Job title, keywords, or company"
+                            class="w-full pl-10 pr-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-white/60"
+                        />
+                        <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    </div>
 
-                <!-- keyword -->
-                <label class="relative">
-                    <span class="sr-only">Search by keyword</span>
-                    <input
-                        type="text"
-                        name="keyword"
-                        placeholder="e.g. Software Engineer, Marketing Assistant, Data Analyst..."
-                        class="w-full rounded-xl border-0 focus:ring-2 focus:ring-white/60 px-12 py-3 text-slate-900 placeholder-slate-500/70 bg-white"
-                    />
-                    <!-- search icon -->
-                    <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <circle cx="11" cy="11" r="7" stroke-width="2"></circle>
-                        <path d="M20 20l-3.5-3.5" stroke-width="2" stroke-linecap="round"></path>
-                    </svg>
-                </label>
+                    <!-- Location Search -->
+                    <div class="col-span-12 md:col-span-3 relative">
+                        <input
+                            type="text"
+                            name="location"
+                            value="{{ request('location') }}"
+                            placeholder="City or state"
+                            class="w-full pl-10 pr-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-white/60"
+                        />
+                        <i class="bi bi-geo-alt absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    </div>
 
-                <!-- location -->
-                <label class="relative">
-                    <span class="sr-only">Location</span>
-                    <input
-                        type="text"
-                        name="location"
-                        placeholder="e.g. Kuala Lumpur, Penang, Johor Bahru..."
-                        class="w-full rounded-xl border-0 focus:ring-2 focus:ring-white/60 px-12 py-3 text-slate-900 placeholder-slate-500/70 bg-white"
-                    />
-                    <!-- pin icon -->
-                    <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M12 21s7-4.35 7-10a7 7 0 10-14 0c0 5.65 7 10 7 10z" stroke-width="2"></path>
-                        <circle cx="12" cy="11" r="2.5" stroke-width="2"></circle>
-                    </svg>
-                </label>
-
-                <!-- buttons -->
-                <div class="flex gap-3">
-                    <!-- Filters trigger -->
-                    <button
-                        x-data
-                        @click="$dispatch('open-filters')"
-                        class="flex-1 md:flex-none md:w-36 rounded-xl bg-white text-[#0F68E1] font-medium py-3 px-4 hover:bg-white/90 transition"
-                        aria-controls="filters-panel"
-                        aria-expanded="false"
-                    >
-                        <span class="inline-flex items-center gap-2 justify-center w-full">
-                            <!-- sliders icon -->
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M4 6h16M4 12h10M4 18h6" stroke-width="2" stroke-linecap="round"></path>
-                                <circle cx="14" cy="6" r="2" stroke-width="2"></circle>
-                                <circle cx="9" cy="12" r="2" stroke-width="2"></circle>
-                                <circle cx="7" cy="18" r="2" stroke-width="2"></circle>
-                            </svg>
+                    <!-- Filter Button -->
+                    <div class="col-span-6 md:col-span-2">
+                        <button 
+                            type="button"
+                            x-data
+                            @click="$dispatch('open-filters')"
+                            class="w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 px-4 py-3 rounded-lg font-semibold transition-colors"
+                            style="color: #FFA500;"
+                        >
+                            <i class="bi bi-funnel"></i>
                             Filters
-                        </span>
-                    </button>
-
-                    <!-- Find Job -->
-                    <button class="flex-1 md:flex-none md:w-36 rounded-xl bg-[#FFA500] text-white font-semibold py-3 px-4 hover:opacity-95 transition">
-                        Find Job
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FILTERS DRAWER / MODAL -->
-    <div x-data="{ open:false }"
-         x-on:open-filters.window="open=true"
-         x-show="open"
-         x-transition.opacity
-         class="fixed inset-0 z-40"
-         aria-labelledby="filters-title"
-         role="dialog"
-         aria-modal="true">
-
-        <!-- backdrop -->
-        <div class="absolute inset-0 bg-black/40" @click="open=false"></div>
-
-        <!-- panel -->
-        <div id="filters-panel"
-             class="absolute right-0 top-0 h-full w-full sm:w-[440px] bg-white p-6 overflow-y-auto card-shadow"
-             x-trap.inert.noscroll="open"
-             x-transition.duration.200ms>
-            <div class="flex items-start justify-between mb-4">
-                <h2 id="filters-title" class="text-xl font-semibold">Filters</h2>
-                <button class="p-2 rounded-lg hover:bg-slate-100" @click="open=false" aria-label="Close filters">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M6 6l12 12M18 6l-12 12" stroke-width="2" stroke-linecap="round"></path>
-                    </svg>
-                </button>
-            </div>
-
-            <!-- filter groups -->
-            <form class="space-y-5">
-                <!-- job type -->
-                <fieldset class="space-y-3">
-                    <legend class="font-medium">Job Type</legend>
-                    <div class="grid grid-cols-2 gap-2">
-                        <label class="flex items-center gap-2">
-                            <input type="checkbox" class="rounded border-slate-300">
-                            <span>Full time</span>
-                        </label>
-                        <label class="flex items-center gap-2">
-                            <input type="checkbox" class="rounded border-slate-300">
-                            <span>Part time</span>
-                        </label>
-                        <label class="flex items-center gap-2">
-                            <input type="checkbox" class="rounded border-slate-300">
-                            <span>Contract</span>
-                        </label>
-                        <label class="flex items-center gap-2">
-                            <input type="checkbox" class="rounded border-slate-300">
-                            <span>Internship</span>
-                        </label>
+                        </button>
                     </div>
-                </fieldset>
 
-                <!-- category -->
-                <div>
-                    <label class="block font-medium mb-2">Category</label>
-                    <select class="w-full rounded-xl border-slate-300">
-                        <option value="">Select a category...</option>
-                        <option>Information Technology</option>
-                        <option>Graphic Design</option>
-                        <option>Education & Training</option>
-                        <option>Marketing & Sales</option>
-                        <option>Finance & Accounting</option>
-                        <option>Human Resources</option>
-                        <option>Engineering</option>
-                        <option>Healthcare</option>
-                        <option>Customer Service</option>
-                        <option>Administration</option>
-                    </select>
-                </div>
-
-                <!-- salary range -->
-                <div>
-                    <label class="block font-medium mb-2">Salary Range (RM)</label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <input type="number" placeholder="e.g. 2000" class="rounded-xl border-slate-300" min="0">
-                        <input type="number" placeholder="e.g. 5000" class="rounded-xl border-slate-300" min="0">
+                    <!-- Find Jobs Button -->
+                    <div class="col-span-6 md:col-span-2">
+                        <button 
+                            type="submit"
+                            class="w-full text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                            style="background-color: #FFA500;"
+                            onmouseover="this.style.backgroundColor='#E6940A'"
+                            onmouseout="this.style.backgroundColor='#FFA500'"
+                        >
+                            Find Jobs
+                        </button>
                     </div>
-                    <p class="text-xs text-slate-500 mt-1">Leave blank for any salary range</p>
-                </div>
-
-                <!-- posted date -->
-                <div>
-                    <label class="block font-medium mb-2">Posted</label>
-                    <select class="w-full rounded-xl border-slate-300">
-                        <option value="">Any time</option>
-                        <option value="1">Past 24 hours</option>
-                        <option value="7">Past 7 days</option>
-                        <option value="14">Past 14 days</option>
-                        <option value="30">Past 30 days</option>
-                    </select>
-                </div>
-
-                <!-- experience level -->
-                <fieldset class="space-y-3">
-                    <legend class="font-medium">Experience Level</legend>
-                    <div class="space-y-2">
-                        <label class="flex items-center gap-2">
-                            <input type="checkbox" class="rounded border-slate-300">
-                            <span>Entry Level (0-1 years)</span>
-                        </label>
-                        <label class="flex items-center gap-2">
-                            <input type="checkbox" class="rounded border-slate-300">
-                            <span>Junior (1-3 years)</span>
-                        </label>
-                        <label class="flex items-center gap-2">
-                            <input type="checkbox" class="rounded border-slate-300">
-                            <span>Mid Level (3-5 years)</span>
-                        </label>
-                        <label class="flex items-center gap-2">
-                            <input type="checkbox" class="rounded border-slate-300">
-                            <span>Senior (5+ years)</span>
-                        </label>
-                    </div>
-                </fieldset>
-
-                <!-- actions -->
-                <div class="flex gap-3 pt-2">
-                    <button type="button" class="flex-1 rounded-xl border border-slate-300 py-3 font-medium hover:bg-slate-50"
-                            @click="$el.closest('form').reset()">
-                        Reset
-                    </button>
-                    <button type="submit" class="flex-1 rounded-xl bg-[#0F68E1] text-white font-semibold py-3 hover:opacity-95">
-                        Apply Filters
-                    </button>
                 </div>
             </form>
         </div>
-    </div>
+    </section>
 
-    <!-- QUICK SUGGESTIONS (Optional - adds more context) -->
-    <div class="max-w-6xl mx-auto px-4 py-4 border-b border-slate-200">
-        <div class="flex flex-wrap items-center gap-2">
-            <span class="text-sm text-slate-600">Popular searches:</span>
-            <button class="text-sm bg-slate-100 hover:bg-slate-200 rounded-full px-3 py-1 transition">Software Engineer</button>
-            <button class="text-sm bg-slate-100 hover:bg-slate-200 rounded-full px-3 py-1 transition">Marketing</button>
-            <button class="text-sm bg-slate-100 hover:bg-slate-200 rounded-full px-3 py-1 transition">Data Analyst</button>
-            <button class="text-sm bg-slate-100 hover:bg-slate-200 rounded-full px-3 py-1 transition">Graphic Designer</button>
-            <button class="text-sm bg-slate-100 hover:bg-slate-200 rounded-full px-3 py-1 transition">Customer Service</button>
+    <!-- FILTERS MODAL -->
+    <div 
+        x-data="{ showFilters: false }"
+        x-on:open-filters.window="showFilters = true"
+        x-show="showFilters"
+        x-transition.opacity.duration.300ms
+        class="fixed inset-0 z-50 overflow-hidden"
+        style="display: none;"
+    >
+        <!-- Backdrop -->
+        <div 
+            class="absolute inset-0 bg-black bg-opacity-50"
+            @click="showFilters = false"
+        ></div>
+
+        <!-- Filter Panel -->
+        <div 
+            class="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-xl"
+            x-show="showFilters"
+            x-transition:enter="transform transition ease-in-out duration-300"
+            x-transition:enter-start="translate-x-full"
+            x-transition:enter-end="translate-x-0"
+            x-transition:leave="transform transition ease-in-out duration-300"
+            x-transition:leave-start="translate-x-0"
+            x-transition:leave-end="translate-x-full"
+        >
+            <!-- Header -->
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">Filter Jobs</h2>
+                <button 
+                    @click="showFilters = false"
+                    class="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                >
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <!-- Filter Form -->
+            <div class="p-6 overflow-y-auto h-full pb-40">
+                <form method="GET" action="{{ route('jobs.index') }}" id="filter-form">
+                    <!-- Keep existing search values -->
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                    <input type="hidden" name="location" value="{{ request('location') }}">
+                    
+                    <!-- Job Type -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Job Type</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer">
+                                <input type="radio" name="job_type" value="" {{ !request('job_type') ? 'checked' : '' }} class="text-blue-600 focus:ring-blue-500">
+                                <span class="ml-3 text-sm text-gray-700">Any Type</span>
+                            </label>
+                            <label class="flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer">
+                                <input type="radio" name="job_type" value="Full-Time" {{ request('job_type') == 'Full-Time' ? 'checked' : '' }} class="text-blue-600 focus:ring-blue-500">
+                                <span class="ml-3 text-sm text-gray-700">Full Time</span>
+                            </label>
+                            <label class="flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer">
+                                <input type="radio" name="job_type" value="Part-Time" {{ request('job_type') == 'Part-Time' ? 'checked' : '' }} class="text-blue-600 focus:ring-blue-500">
+                                <span class="ml-3 text-sm text-gray-700">Part Time</span>
+                            </label>
+                            <label class="flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer">
+                                <input type="radio" name="job_type" value="Contract" {{ request('job_type') == 'Contract' ? 'checked' : '' }} class="text-blue-600 focus:ring-blue-500">
+                                <span class="ml-3 text-sm text-gray-700">Contract</span>
+                            </label>
+                            <label class="flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer">
+                                <input type="radio" name="job_type" value="Internship" {{ request('job_type') == 'Internship' ? 'checked' : '' }} class="text-blue-600 focus:ring-blue-500">
+                                <span class="ml-3 text-sm text-gray-700">Internship</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Specialization -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3 mt-6">Specialization</label>
+                        <select name="category" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                            <option value="">Any Specialization</option>
+                            <option value="Information Technology" {{ request('category') == 'Information Technology' ? 'selected' : '' }}>Information Technology</option>
+                            <option value="Marketing" {{ request('category') == 'Marketing' ? 'selected' : '' }}>Marketing</option>
+                            <option value="Finance" {{ request('category') == 'Finance' ? 'selected' : '' }}>Finance</option>
+                            <option value="Healthcare" {{ request('category') == 'Healthcare' ? 'selected' : '' }}>Healthcare</option>
+                            <option value="Education" {{ request('category') == 'Education' ? 'selected' : '' }}>Education</option>
+                            <option value="Sales" {{ request('category') == 'Sales' ? 'selected' : '' }}>Sales</option>
+                            <option value="Engineering" {{ request('category') == 'Engineering' ? 'selected' : '' }}>Engineering</option>
+                        </select>
+                    </div>
+
+                    <!-- Education Level -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3 mt-6">Education Level</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer">
+                                <input type="radio" name="experience" value="" {{ !request('experience') ? 'checked' : '' }} class="text-blue-600 focus:ring-blue-500">
+                                <span class="ml-3 text-sm text-gray-700">Any Level</span>
+                            </label>
+                            <label class="flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer">
+                                <input type="radio" name="experience" value="SPM" {{ request('experience') == 'SPM' ? 'checked' : '' }} class="text-blue-600 focus:ring-blue-500">
+                                <span class="ml-3 text-sm text-gray-700">SPM</span>
+                            </label>
+                            <label class="flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer">
+                                <input type="radio" name="experience" value="Diploma" {{ request('experience') == 'Diploma' ? 'checked' : '' }} class="text-blue-600 focus:ring-blue-500">
+                                <span class="ml-3 text-sm text-gray-700">Diploma</span>
+                            </label>
+                            <label class="flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer">
+                                <input type="radio" name="experience" value="Degree" {{ request('experience') == 'Degree' ? 'checked' : '' }} class="text-blue-600 focus:ring-blue-500">
+                                <span class="ml-3 text-sm text-gray-700">Bachelor's Degree</span>
+                            </label>
+                            <label class="flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer">
+                                <input type="radio" name="experience" value="Master" {{ request('experience') == 'Master' ? 'checked' : '' }} class="text-blue-600 focus:ring-blue-500">
+                                <span class="ml-3 text-sm text-gray-700">Master's Degree</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Salary Range -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3 mt-6">Salary Range (RM)</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <input 
+                                type="number" 
+                                name="min_salary"
+                                value="{{ request('min_salary') }}"
+                                placeholder="Min" 
+                                class="rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                            >
+                            <input 
+                                type="number" 
+                                name="max_salary"
+                                value="{{ request('max_salary') }}"
+                                placeholder="Max" 
+                                class="rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Posted Date -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3 mt-6">Posted Date</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer">
+                                <input type="radio" name="posted" value="" {{ !request('posted') ? 'checked' : '' }} class="text-blue-600 focus:ring-blue-500">
+                                <span class="ml-3 text-sm text-gray-700">Any Time</span>
+                            </label>
+                            <label class="flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer">
+                                <input type="radio" name="posted" value="1" {{ request('posted') == '1' ? 'checked' : '' }} class="text-blue-600 focus:ring-blue-500">
+                                <span class="ml-3 text-sm text-gray-700">Past 24 hours</span>
+                            </label>
+                            <label class="flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer">
+                                <input type="radio" name="posted" value="7" {{ request('posted') == '7' ? 'checked' : '' }} class="text-blue-600 focus:ring-blue-500">
+                                <span class="ml-3 text-sm text-gray-700">Past week</span>
+                            </label>
+                            <label class="flex items-center p-2 rounded hover:bg-gray-50 cursor-pointer">
+                                <input type="radio" name="posted" value="30" {{ request('posted') == '30' ? 'checked' : '' }} class="text-blue-600 focus:ring-blue-500">
+                                <span class="ml-3 text-sm text-gray-700">Past month</span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Filter Actions -->
+            <div class="absolute bottom-0 left-0 right-0 p-6 bg-white border-t border-gray-200">
+                <div class="flex gap-3">
+                    <a 
+                        href="{{ route('jobs.index') }}"
+                        class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-3 rounded-lg font-medium text-center transition-colors"
+                    >
+                        Clear All
+                    </a>
+                    <button 
+                        type="button"
+                        @click="document.getElementById('filter-form').submit(); showFilters = false;"
+                        class="flex-1 text-white px-4 py-3 rounded-lg font-medium transition-colors"
+                        style="background-color: #FFA500;"
+                        onmouseover="this.style.backgroundColor='#E6940A'"
+                        onmouseout="this.style.backgroundColor='#FFA500'"
+                    >
+                        Apply Filters
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- RESULTS HEADER -->
-    <div class="max-w-6xl mx-auto px-4 py-6">
-        <div class="flex items-center justify-between">
-            <p class="text-slate-600"><span class="font-semibold text-slate-900">78</span> Jobs Available</p>
-            <div class="flex items-center gap-3">
-                <label class="text-sm text-slate-600">Sort by:</label>
-                <select class="text-sm border-slate-300 rounded-lg">
-                    <option>Most Recent</option>
-                    <option>Most Relevant</option>
-                    <option>Salary (High to Low)</option>
-                    <option>Salary (Low to High)</option>
+    <!-- SEARCH RESULTS -->
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        
+        <!-- Results Header -->
+        <div class="md:flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Job Search Results</h1>
+                <p class="text-gray-600 mt-1">
+                    Found {{ $jobs->total() }} jobs
+                    @if(request('search'))
+                        for "{{ request('search') }}"
+                    @endif
+                    @if(request('location'))
+                        in {{ request('location') }}
+                    @endif
+                </p>
+            </div>
+            
+            <!-- Sort Options -->
+            <div class="flex items-center gap-3 mt-4 md:mt-0">
+                <label class="text-sm text-gray-600">Sort by:</label>
+                <select 
+                    name="sort" 
+                    onchange="updateSort(this.value)"
+                    class="text-sm border-gray-300 rounded-lg"
+                >
+                    <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
+                    <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest First</option>
+                    <option value="title" {{ request('sort') == 'title' ? 'selected' : '' }}>Job Title A-Z</option>
                 </select>
             </div>
         </div>
-    </div>
 
-    <!-- JOB LIST -->
-    <section class="max-w-6xl mx-auto px-4 space-y-4">
-        <!-- card -->
-        <article class="rounded-2xl border border-slate-200 card-shadow p-5 hover:shadow-lg transition-shadow">
-            <div class="flex items-start justify-between gap-4">
-                <div class="flex items-start gap-4">
-                    <img src="https://www.google.com/favicon.ico" class="w-10 h-10 rounded" alt="Company logo">
-                    <div>
-                        <h3 class="text-lg font-semibold hover:text-blue-600 cursor-pointer">Technical Support Specialist</h3>
-                        <p class="text-slate-500 text-sm">Google Inc.</p>
-                        <div class="flex flex-wrap items-center gap-4 mt-2 text-sm text-slate-600">
-                            <span class="inline-flex items-center gap-2">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7h16M4 12h16M4 17h16" stroke-width="2"/></svg>
-                                Information Technology
-                            </span>
-                            <span class="inline-flex items-center gap-2">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9" stroke-width="2"/><path d="M12 7v5l3 3" stroke-width="2" stroke-linecap="round"/></svg>
-                                Full time
-                            </span>
-                            <span class="inline-flex items-center gap-2">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="6" width="18" height="12" rx="2" stroke-width="2"/><path d="M3 10h18" stroke-width="2"/></svg>
-                                RM 3,800 – RM 4,200
-                            </span>
-                            <span class="inline-flex items-center gap-2">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 21s7-4.35 7-10a7 7 0 10-14 0c0 5.65 7 10 7 10z" stroke-width="2"/><circle cx="12" cy="11" r="2.5" stroke-width="2"/></svg>
-                                Kuala Lumpur
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex flex-col items-end gap-2">
-                    <div class="text-slate-500 text-sm">3 hours ago</div>
-                    <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">Save Job</button>
+        <!-- Active Filters Display -->
+        @if(request()->hasAny(['search', 'location', 'job_type', 'category', 'experience', 'posted', 'min_salary', 'max_salary']))
+        <div class="mb-6 p-4 bg-white rounded-lg">
+            <div class="flex items-center justify-between flex-wrap">
+                <div class="flex flex-wrap gap-2 mb-2 md:mb-0">
+                    <span class="text-sm text-gray-600">Active filters:</span>
+                    
+                    @if(request('search'))
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                            Search: {{ request('search') }}
+                        </span>
+                    @endif
+                    
+                    @if(request('location'))
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                            Location: {{ request('location') }}
+                        </span>
+                    @endif
+                    
+                    @if(request('job_type'))
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                            Type: {{ request('job_type') }}
+                        </span>
+                    @endif
+                    
+                    @if(request('category'))
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                            Category: {{ request('category') }}
+                        </span>
+                    @endif
+
+                    @if(request('experience'))
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                            Education: {{ request('experience') }}
+                        </span>
+                    @endif
+
+                    @if(request('min_salary') || request('max_salary'))
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                            Salary: RM {{ request('min_salary', '0') }} - {{ request('max_salary', '∞') }}
+                        </span>
+                    @endif
                 </div>
             </div>
-        </article>
-
-        <!-- card -->
-        <article class="rounded-2xl border border-slate-200 card-shadow p-5 hover:shadow-lg transition-shadow">
-            <div class="flex items-start justify-between gap-4">
-                <div class="flex items-start gap-4">
-                    <div class="w-10 h-10 rounded bg-slate-200 grid place-items-center text-slate-500 font-semibold">L</div>
-                    <div>
-                        <h3 class="text-lg font-semibold hover:text-blue-600 cursor-pointer">Junior Figma Designer</h3>
-                        <p class="text-slate-500 text-sm">ELITE LIMITED</p>
-                        <div class="flex flex-wrap items-center gap-4 mt-2 text-sm text-slate-600">
-                            <span class="inline-flex items-center gap-2">🎨 Graphic Design</span>
-                            <span class="inline-flex items-center gap-2">🕒 Full time</span>
-                            <span class="inline-flex items-center gap-2">💼 RM 2,800 – RM 3,000</span>
-                            <span class="inline-flex items-center gap-2">📍 Penang</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex flex-col items-end gap-2">
-                    <div class="text-slate-500 text-sm">16 days ago</div>
-                    <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">Save Job</button>
-                </div>
-            </div>
-        </article>
-
-        <!-- card -->
-        <article class="rounded-2xl border border-slate-200 card-shadow p-5 hover:shadow-lg transition-shadow">
-            <div class="flex items-start justify-between gap-4">
-                <div class="flex items-start gap-4">
-                    <div class="w-10 h-10 rounded bg-slate-200 grid place-items-center text-slate-600 font-bold">INTI</div>
-                    <div>
-                        <h3 class="text-lg font-semibold hover:text-blue-600 cursor-pointer">Lecturer</h3>
-                        <p class="text-slate-500 text-sm">INTI International College Penang</p>
-                        <div class="flex flex-wrap items-center gap-4 mt-2 text-sm text-slate-600">
-                            <span class="inline-flex items-center gap-2">🎓 Education & Training</span>
-                            <span class="inline-flex items-center gap-2">🕒 Part time</span>
-                            <span class="inline-flex items-center gap-2">💼 Undisclosed</span>
-                            <span class="inline-flex items-center gap-2">📍 Bayan Lepas, Penang</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex flex-col items-end gap-2">
-                    <div class="text-slate-500 text-sm">3 days ago</div>
-                    <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">Save Job</button>
-                </div>
-            </div>
-        </article>
-    </section>
-
-    <!-- PAGINATION -->
-    <div class="max-w-6xl mx-auto px-4">
-        <div class="flex items-center justify-center gap-2 py-8">
-            <button class="p-2 rounded-full border border-slate-300 hover:bg-slate-50" aria-label="Previous page">←</button>
-            <button class="w-9 h-9 rounded-full bg-[#0F68E1] text-white font-semibold">1</button>
-            <button class="w-9 h-9 rounded-full hover:bg-slate-100">2</button>
-            <button class="w-9 h-9 rounded-full hover:bg-slate-100">3</button>
-            <button class="w-9 h-9 rounded-full hover:bg-slate-100">4</button>
-            <button class="p-2 rounded-full border border-slate-300 hover:bg-slate-50" aria-label="Next page">→</button>
         </div>
+        @endif
+
+        <!-- Job Cards -->
+        <div class="space-y-6">
+            @forelse($jobs as $job)
+            <div 
+                class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer flex min-h-40"
+                onclick="showJobModal({{ $job->id }})"
+            >
+                <!-- Main content wrapper -->
+                <div class="flex items-start justify-between w-full">
+                    <div class="flex items-start gap-4 flex-1">
+                        <!-- Company Logo -->
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0 border">
+                            @if($job->employer && $job->employer->logo)
+                                <img src="{{ $job->employer->logo }}" alt="{{ $job->employer->company_name }}" class="w-full h-full rounded-xl object-cover">
+                            @else
+                                <span class="text-blue-600 font-bold text-xl">
+                                    {{ $job->employer ? substr($job->employer->company_name, 0, 1) : 'C' }}
+                                </span>
+                            @endif
+                        </div>
+                        
+                        <!-- Job Info -->
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-gray-900">
+                                {{ $job->title }}
+                            </h3>
+                            <p class="text-gray-600 mt-1 font-medium">{{ $job->employer->company_name ?? 'Company' }}</p>
+                            
+                            <!-- Job Meta -->
+                            <div class="flex flex-wrap gap-4 mt-4 text-sm">
+                                @if($job->location)
+                                <span class="flex items-center gap-2 text-gray-600 bg-gray-50 px-3 py-1 rounded-full">
+                                    <i class="bi bi-geo-alt text-blue-500"></i>
+                                    {{ $job->location }}
+                                </span>
+                                @endif
+                                
+                                @if($job->job_type)
+                                <span class="flex items-center gap-2 text-gray-600 bg-gray-50 px-3 py-1 rounded-full">
+                                    <i class="bi bi-clock text-green-500"></i>
+                                    {{ $job->job_type }}
+                                </span>
+                                @endif
+                                
+                                @if($job->specialization)
+                                <span class="flex items-center gap-2 text-gray-600 bg-gray-50 px-3 py-1 rounded-full">
+                                    <i class="bi bi-briefcase text-purple-500"></i>
+                                    {{ $job->specialization }}
+                                </span>
+                                @endif
+                                
+                                <!-- Salary display -->
+                                @if($job->salary_display && ($job->salary_min || $job->salary_max))
+                                <span class="flex items-center gap-2 text-gray-600 bg-gray-50 px-3 py-1 rounded-full">
+                                    <i class="bi bi-currency-dollar text-orange-500"></i>
+                                    @if($job->salary_min && $job->salary_max)
+                                        RM {{ number_format($job->salary_min) }} - {{ number_format($job->salary_max) }}
+                                    @elseif($job->salary_min)
+                                        From RM {{ number_format($job->salary_min) }}
+                                    @elseif($job->salary_max)
+                                        Up to RM {{ number_format($job->salary_max) }}
+                                    @endif
+                                </span>
+                                @else
+                                <span class="flex items-center gap-2 text-gray-600 bg-gray-50 px-3 py-1 rounded-full">
+                                    <i class="bi bi-currency-dollar text-orange-500"></i>
+                                    Undisclosed
+                                </span>
+                                @endif
+                            </div>
+                            
+                            <!-- Job Description Preview -->
+                            @if($job->job_overview)
+                            <p class="text-gray-600 mt-3 line-clamp-2 leading-relaxed">
+                                {{ Str::limit($job->job_overview, 150) }}
+                            </p>
+                            @endif
+                        </div>
+                    </div>
+                    
+                    <!-- Posted Date and Save Button -->
+                    <div class="flex flex-col justify-between items-end h-full">            
+                        <!-- Save Button -->
+                        <button 
+                            class="text-gray-400 hover:text-red-500 transition-colors p-2"
+                            onclick="event.stopPropagation(); saveJob({{ $job->id }})"
+                            title="Save this job"
+                        >
+                            <i class="bi bi-heart text-xl"></i>
+                        </button>
+
+                        <!-- Posted Date -->
+                        <span class="text-sm text-gray-400">
+                            Posted {{ $job->posted_date ? $job->posted_date->diffForHumans() : $job->created_at->diffForHumans() }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            @empty
+            <!-- No Jobs Found -->
+            <div class="text-center py-16">
+                <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="bi bi-search text-4xl text-gray-400"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">No jobs found</h3>
+                <p class="text-gray-500 mb-6 max-w-md mx-auto">Try adjusting your search criteria or browse all available jobs to find opportunities that match your skills.</p>
+                <a 
+                    href="{{ route('jobs.index') }}" 
+                    class="inline-block text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg"
+                    style="background-color: #FFA500;"
+                    onmouseover="this.style.backgroundColor='#E6940A'"
+                    onmouseout="this.style.backgroundColor='#FFA500'"
+                >
+                    View All Jobs
+                </a>
+            </div>
+            @endforelse
+        </div>
+
+        <!-- Pagination -->
+        @if($jobs->hasPages())
+        <div class="mt-12 flex justify-center">
+            {{ $jobs->appends(request()->query())->links() }}
+        </div>
+        @endif
     </div>
 
+    <!-- Job Details Modal -->
+    <dialog id="job_detail_modal" class="modal modal-bottom">
+        <div class="modal-box w-full max-w-full p-0 rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-hidden">
+            
+            <!-- Modal Header -->
+            <div class="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-start justify-between">
+                <div class="flex items-start gap-4 flex-1">
+                    <!-- Company Logo -->
+                    <div class="w-14 h-14 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0 border">
+                        <span id="modal-company-logo" class="text-blue-600 font-bold text-xl"></span>
+                    </div>
+                    
+                    <!-- Job Info -->
+                    <div class="flex-1 min-w-0">
+                        <h2 id="modal-job-title" class="text-2xl font-bold text-gray-900 mb-1"></h2>
+                        
+                        <!-- Company and Location -->
+                        <div class="flex items-center gap-3 text-gray-600 mb-3">
+                            <span id="modal-company-name" class="font-medium"></span>
+                        </div>
+                        
+                        <!-- Job Type and Salary -->
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-mediumflex items-center gap-1 text-md" id="modal-location-container">
+                                <i class="bi bi-geo-alt"></i>
+                                <span id="modal-location"></span>
+                            </span>
+                            <span id="modal-job-type" class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"></span>
+                            <span id="modal-salary" class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Close Button -->
+                <button onclick="closeJobModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold p-2 -mr-2">&times;</button>
+            </div>
+
+            <!-- Loading State -->
+            <div id="modal-loading" class="flex justify-center items-center py-20">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+
+            <!-- Modal Content -->
+            <div id="modal-job-details" class="overflow-y-auto flex-1" style="display: none; max-height: calc(80vh - 200px);">
+                <div class="p-8 divide-y divide-gray-200 grid gap-6">
+                    
+                    <!-- Job Overview Section -->
+                    <div id="modal-overview-section">
+                        <p class="text-lg font-bold text-gray-900 mb-2">Job Overview</p>
+                        <p id="modal-job-overview" class="text-gray-600 leading-relaxed text-base"></p>
+                    </div>
+
+                    <!-- Responsibilities Section -->
+                    <div id="modal-responsibilities-section" class="pt-6" style="display: none;">
+                        <p class="text-lg font-bold text-gray-900 mb-2">Responsibilities</p>
+                        <ul id="modal-responsibilities" class="space-y-3 text-gray-600 text-base">
+                            <!-- Dynamic content will be populated here -->
+                        </ul>
+                    </div>
+
+                    <!-- Requirements Section -->
+                    <div id="modal-requirements-section" class="pt-6" style="display: none;">
+                        <p class="text-lg font-bold text-gray-900 mb-2">Requirements</p>
+                        <ul id="modal-requirements" class="space-y-3 text-gray-600 text-base">
+                            <!-- Dynamic content will be populated here -->
+                        </ul>
+                    </div>
+
+                    <!-- Skills Section -->
+                    <div id="modal-skills-section" class="pt-6" style="display: none;">
+                        <p class="text-lg font-bold text-gray-900 mb-2">Skills</p>
+                        <div id="modal-skills" class="flex flex-wrap gap-3">
+                            <!-- Dynamic skill badges will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Additional Job Details -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-8">
+                        <!-- Education Level -->
+                        <div id="modal-education-section" style="display: none;">
+                            <p class="text-lg font-semibold text-gray-900 mb-2">Education Level</p>
+                            <p id="modal-education" class="text-gray-600 text-base"></p>
+                        </div>
+
+                        <!-- Experience Level -->
+                        <div id="modal-experience-section" style="display: none;">
+                            <p class="text-lg font-semibold text-gray-900 mb-2">Experience Level</p>
+                            <p id="modal-experience" class="text-gray-600 text-base"></p>
+                        </div>
+
+                        <!-- Specialization -->
+                        <div id="modal-specialization-section" style="display: none;">
+                            <p class="text-lg font-semibold text-gray-900 mb-2">Specialization</p>
+                            <p id="modal-specialization" class="text-gray-600 text-base"></p>
+                        </div>
+
+                        <!-- Employment Type -->
+                        <div id="modal-employment-section" style="display: none;">
+                            <p class="text-lg font-semibold text-gray-900 mb-2">Employment Type</p>
+                            <p id="modal-employment-type" class="text-gray-600 text-base"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+             <div class="flex sticky bottom-0 bg-white border-t border-gray-200 p-6 justify-between items-center">
+                <div class="text-md text-gray-500">
+                    Posted <span id="modal-posted-date"></span>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button 
+                        id="save-job-btn"
+                        onclick="saveJob()"
+                        class="px-6 py-2 border border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors"
+                    >
+                        Save
+                    </button>
+                    <button 
+                        id="apply-job-btn"
+                        onclick="applyForJob()"
+                        class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                        Apply Now
+                    </button>
+                </div>
+             </div>
+        </div>
+        
+        <!-- Modal Backdrop -->
+        <form method="dialog" class="modal-backdrop">
+            <button onclick="closeJobModal()">close</button>
+        </form>
+    </dialog>
+
+    <!-- Apply Job Modal -->
+    <dialog id="apply_job_modal" class="modal">
+        <div class="modal-box w-11/12 max-w-xl">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+                <h3 class="text-xl font-bold text-gray-900">
+                    Apply Job: <span id="apply-job-title">Job Title</span>
+                </h3>
+                <form method="dialog">
+                    <button class="btn btn-sm btn-circle btn-ghost">✕</button>
+                </form>
+            </div>
+            
+            <!-- Modal Content -->
+            <div class="py-6 space-y-6">
+                <!-- Choose Resume Section -->
+                <div>
+                    <label class="block text-lg font-semibold text-gray-900 mb-4">Choose Resume</label>
+                    <div class="relative">
+                        <select 
+                            id="resume-select" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
+                        >
+                            <option value="">Select...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <button 
+                    type="button" 
+                    onclick="closeApplyModal()" 
+                    class="px-6 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                    Cancel
+                </button>
+                <button 
+                    type="button" 
+                    onclick="submitApplication()" 
+                    id="submit-application-btn"
+                    class="px-8 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled
+                >
+                    Apply Now
+                </button>
+            </div>
+        </div>
+        
+        <!-- Modal Backdrop -->
+        <form method="dialog" class="modal-backdrop">
+            <button onclick="closeApplyModal()">close</button>
+        </form>
+    </dialog>
+
+    <script>
+    // Initialize apply modal functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Character counter for cover letter
+        const textarea = document.getElementById('cover-letter-textarea');
+        const counter = document.getElementById('cover-letter-count');
+        
+        if (textarea && counter) {
+            textarea.addEventListener('input', () => {
+                const length = textarea.value.length;
+                counter.textContent = length;
+                
+                if (length > 1000) {
+                    counter.classList.add('text-red-500');
+                    textarea.value = textarea.value.substring(0, 1000);
+                    counter.textContent = '1000';
+                } else {
+                    counter.classList.remove('text-red-500');
+                }
+            });
+        }
+        
+        // Resume selection validation
+        const resumeSelect = document.getElementById('resume-select');
+        const submitBtn = document.getElementById('submit-application-btn');
+        
+        if (resumeSelect && submitBtn) {
+            resumeSelect.addEventListener('change', () => {
+                submitBtn.disabled = !resumeSelect.value;
+            });
+        }
+    });
+    </script>
 </x-public-layout>

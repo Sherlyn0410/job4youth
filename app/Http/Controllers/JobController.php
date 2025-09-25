@@ -1,0 +1,251 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Job;
+use App\Models\Application;
+
+class JobController extends Controller
+{
+    public function index(Request $request)
+    {
+        // Start with base query
+        $query = Job::active()->with('employer');
+        
+        // Search functionality
+        if ($request->filled('search')) {
+            $searchTerm = $request->input('search');
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('job_overview', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('skills', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('requirements', 'LIKE', "%{$searchTerm}%")
+                  ->orWhereHas('employer', function($eq) use ($searchTerm) {
+                      $eq->where('company_name', 'LIKE', "%{$searchTerm}%");
+                  });
+            });
+        }
+        
+        // Location filter
+        if ($request->filled('location')) {
+            $location = $request->input('location');
+            $query->where('location', 'LIKE', "%{$location}%");
+        }
+        
+        // Specialization filter
+        if ($request->filled('specialization')) {
+            $specialization = $request->input('specialization');
+            $query->where('specialization', 'LIKE', "%{$specialization}%");
+        }
+        
+        // Job type filter
+        if ($request->filled('job_type')) {
+            $jobType = $request->input('job_type');
+            $query->where('job_type', $jobType);
+        }
+        
+        // Education level filter
+        if ($request->filled('education_level')) {
+            $educationLevel = $request->input('education_level');
+            $query->where('education_level', $educationLevel);
+        }
+        
+        // Salary range filter
+        if ($request->filled('salary_min')) {
+            $query->where('salary_max', '>=', $request->input('salary_min'));
+        }
+        
+        if ($request->filled('salary_max')) {
+            $query->where('salary_min', '<=', $request->input('salary_max'));
+        }
+        
+        // Sorting
+        $sortBy = $request->input('sort', 'latest');
+        switch ($sortBy) {
+            case 'latest':
+                $query->orderBy('created_at', 'desc');
+                break;
+            case 'oldest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'salary_high':
+                $query->orderBy('salary_max', 'desc');
+                break;
+            case 'salary_low':
+                $query->orderBy('salary_min', 'asc');
+                break;
+            case 'title':
+                $query->orderBy('title', 'asc');
+                break;
+            default:
+                $query->orderBy('created_at', 'desc');
+        }
+        
+        // Paginate results
+        $jobs = $query->paginate(10);
+        
+        // Get filter options for the filter sidebar
+        $specializations = Job::active()
+            ->whereNotNull('specialization')
+            ->select('specialization')
+            ->distinct()
+            ->pluck('specialization')
+            ->filter()
+            ->sort()
+            ->values();
+        
+        $locations = Job::active()
+            ->whereNotNull('location')
+            ->select('location')
+            ->distinct()
+            ->pluck('location')
+            ->filter()
+            ->sort()
+            ->values();
+        
+        $jobTypes = Job::active()
+            ->whereNotNull('job_type')
+            ->select('job_type')
+            ->distinct()
+            ->pluck('job_type')
+            ->filter()
+            ->sort()
+            ->values();
+        
+        $educationLevels = Job::active()
+            ->whereNotNull('education_level')
+            ->select('education_level')
+            ->distinct()
+            ->pluck('education_level')
+            ->filter()
+            ->sort()
+            ->values();
+        
+        return view('jobs', compact(
+            'jobs',
+            'specializations',
+            'locations',
+            'jobTypes',
+            'educationLevels'
+        ));
+    }
+
+    public function show($id)
+    {
+        $job = Job::active()->with('employer')->findOrFail($id);
+        
+        // Increment view count
+        $job->incrementViews();
+        
+        return view('job-details', compact('job'));
+    }
+
+    // API endpoint for modal data
+    public function getJobDetails($id)
+    {
+        try {
+            // Find active job by ID with employer relationship
+            $job = Job::active()->with('employer')->findOrFail($id);
+            
+            // Increment view count
+            $job->incrementViews();
+
+            // Check if user has applied (only if authenticated)
+            $hasApplied = auth()->check() ? auth()->user()->hasAppliedFor($id) : false;
+
+            // Return formatted job data for modal
+            return response()->json([
+                'success' => true,
+                'job' => [
+                    'id' => $job->id,
+                    'title' => $job->title,
+                    'company_name' => $job->employer->company_name ?? 'Company',
+                    'company_logo' => $job->employer->logo ?? null,
+                    'location' => $job->location,
+                    'job_type' => $job->job_type,
+                    'specialization' => $job->specialization,
+                    'education_level' => $job->education_level,
+                    'salary_min' => $job->salary_min,
+                    'salary_max' => $job->salary_max,
+                    'salary_display' => $job->salary_display ?? true,
+                    'salary_range' => $job->salary_range,
+                    'job_overview' => $job->job_overview,
+                    'responsibilities' => $job->responsibilities,
+                    'requirements' => $job->requirements,
+                    'skills' => $job->skills,
+                    'posted_date' => $job->posted_date ? $job->posted_date->diffForHumans() : $job->created_at->diffForHumans(),
+                    'job_view' => $job->job_view ?? 0,
+                    'has_applied' => $hasApplied,
+                    'application_count' => $job->applications()->count()
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Job not found'
+            ], 404);
+        }
+    }
+
+    // Apply for job functionality
+    public function applyForJob(Request $request, $id)
+    {
+        try {
+            $job = Job::active()->with('employer')->findOrFail($id);
+            $user = auth()->user();
+            
+            // Check if user has already applied
+            if ($user->hasAppliedFor($id)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You have already applied for this job'
+                ], 400);
+            }
+            
+            // Create application
+            $application = Application::create([
+                'employer_id' => $job->employer_id,
+                'user_id' => $user->id,
+                'job_post_id' => $id,
+                'status' => 'submitted',
+                'apply_date' => now(),
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => "Your application for {$job->title} at {$job->employer->company_name} has been submitted successfully!",
+                'application_id' => $application->id
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error submitting application: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Save job functionality (if you want to implement this)
+    public function saveJob($id)
+    {
+        try {
+            $job = Job::active()->findOrFail($id);
+            $user = auth()->user();
+            
+            // You'll need to create a saved_jobs table and relationship
+            // For now, just return success
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Job saved successfully'
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error saving job'
+            ], 500);
+        }
+    }
+}

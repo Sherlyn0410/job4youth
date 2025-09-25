@@ -30,7 +30,28 @@ class AuthenticatedSessionController extends Controller
 
             $request->session()->regenerate();
 
-            return redirect()->intended('/dashboard');
+            // Set a flash message for login success
+            session()->flash('login_success', true);
+
+            // If this was an AJAX request, return JSON
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Login successful',
+                    'redirect' => $request->session()->get('url.intended', '/dashboard')
+                ]);
+            }
+
+            // Check if user was trying to do a job action before login
+            $intendedUrl = $request->session()->get('url.intended', '/dashboard');
+            
+            // If coming from jobs page, redirect back to jobs
+            if (str_contains($request->headers->get('referer', ''), '/jobs')) {
+                return redirect()->route('jobs.index')->with('login_success', true);
+            }
+
+            return redirect()->intended($intendedUrl)->with('login_success', true);
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Keep the login modal open when there are validation errors
             return redirect()->back()

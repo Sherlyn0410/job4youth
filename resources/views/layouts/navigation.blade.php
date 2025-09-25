@@ -6,7 +6,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('home') }}">
-                        <img src="{{ asset('assets/img/Job4Youth.png') }}" alt="Job4Youth" class="block h-5 w-auto"> 
+                        <x-application-logo class="block h-5 w-auto" />
                     </a>
                 </div>
 
@@ -22,7 +22,8 @@
                         </x-nav-link>
                     @endauth
                     
-                    <x-nav-link :href="route('jobs')" :active="request()->routeIs('jobs')">
+                    <!-- Updated Jobs Navigation Link -->
+                    <x-nav-link :href="route('jobs.index')" :active="request()->routeIs('jobs.*') || request()->is('jobs*')">
                         {{ __('Job Search') }}
                     </x-nav-link>
                     
@@ -151,7 +152,8 @@
                 </x-responsive-nav-link>
             @endauth
             
-            <x-responsive-nav-link :href="route('jobs')" :active="request()->routeIs('jobs')">
+            <!-- Updated Mobile Jobs Navigation Link -->
+            <x-responsive-nav-link :href="route('jobs.index')" :active="request()->routeIs('jobs.*') || request()->is('jobs*')">
                 {{ __('Search Jobs') }}
             </x-responsive-nav-link>
             

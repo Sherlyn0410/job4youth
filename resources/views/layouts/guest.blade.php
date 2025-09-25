@@ -23,7 +23,7 @@
             <div class="flex flex-col sm:justify-center items-center pt-6 sm:pt-0 py-12">
                 <div>
                     <a href="{{ route('home') }}">
-                        <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+                        <x-application-logo class="block h-5 w-auto" />
                     </a>
                 </div>
 
