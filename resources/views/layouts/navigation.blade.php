@@ -91,6 +91,10 @@
                         <button @click="$dispatch('open-modal', 'register')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-md font-medium">
                             {{ __('Register') }}
                         </button>
+                        
+                        <a href="{{ route('employer.login') }}" class="text-blue-600 hover:text-blue-700 px-4 py-2 rounded-md text-md font-medium transition-colors">
+                            {{ __('Employer Site') }}
+                        </a>
                     </div>
                 @else
                     <!-- User Dropdown -->
@@ -124,6 +128,11 @@
                             </form>
                         </x-slot>
                     </x-dropdown>
+                    
+                    <!-- ADD THIS: Employer Site Button for logged in users too -->
+                    <a href="{{ route('employer.login') }}" class="ml-4 text-blue-600 hover:text-blue-700 px-4 py-2 rounded-md text-md font-medium transition-colors flex items-center gap-2">
+                        {{ __('Employer Site') }}
+                    </a>
                 @endguest
             </div>
 
@@ -183,6 +192,12 @@
                 <x-responsive-nav-link :href="route('career-guidance')" class="pl-8">
                     {{ __('Career Guidance Tools') }}
                 </x-responsive-nav-link>
+                
+                <!-- ADD THIS: Mobile Employer Site Link -->
+                <a href="{{ route('employer.login') }}" class="block pl-8 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-green-600 hover:text-green-800 hover:bg-green-50 hover:border-green-300 focus:outline-none focus:text-green-800 focus:bg-green-50 focus:border-green-300 transition duration-150 ease-in-out">
+                    <i class="bi bi-building mr-2"></i>
+                    {{ __('Employer Site') }}
+                </a>
             </div>
         </div>
 

@@ -9,55 +9,45 @@ class Job extends Model
 {
     use HasFactory;
 
-    // Specify the table name
     protected $table = 'job_posts';
 
     protected $fillable = [
         'employer_id',
-        'admin_id',
         'title',
-        'location',
-        'job_type',
-        'specialization',
-        'education_level',
-        'salary_min',
-        'salary_max',
-        'salary_display',
         'job_overview',
         'responsibilities',
         'requirements',
         'skills',
+        'job_type',
+        'location',
+        'salary_min',
+        'salary_max',
+        'salary_display',
+        'education_level',
+        'experience_level',
+        'specialization',
+        'application_deadline',
         'status',
-        'posted_date',
-        'job_view'
+        'featured'
     ];
 
     protected $casts = [
+        'responsibilities' => 'array',
+        'requirements' => 'array',
+        'skills' => 'array',
         'salary_min' => 'decimal:2',
         'salary_max' => 'decimal:2',
         'salary_display' => 'boolean',
-        'posted_date' => 'datetime',
-        'job_view' => 'integer',
+        'application_deadline' => 'date',
+        'featured' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime'
     ];
 
-    // Scope for open/active jobs only
-    public function scopeActive($query)
-    {
-        return $query->where('status', 'open');
-    }
-
     // Relationship with employer
     public function employer()
     {
-        return $this->belongsTo(Employer::class);
-    }
-
-    // Relationship with admin
-    public function admin()
-    {
-        return $this->belongsTo(Admin::class);
+        return $this->belongsTo(Employer::class, 'employer_id');
     }
 
     // Relationship with applications
@@ -66,11 +56,23 @@ class Job extends Model
         return $this->hasMany(Application::class, 'job_post_id');
     }
 
-    // Accessor for formatted salary range
+    // Scope for active jobs
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    // Scope for featured jobs
+    public function scopeFeatured($query)
+    {
+        return $query->where('featured', true);
+    }
+
+    // Get formatted salary range
     public function getSalaryRangeAttribute()
     {
-        if (!$this->salary_display || (!$this->salary_min && !$this->salary_max)) {
-            return null;
+        if (!$this->salary_display) {
+            return 'Undisclosed';
         }
 
         if ($this->salary_min && $this->salary_max) {
@@ -81,24 +83,21 @@ class Job extends Model
             return 'Up to RM ' . number_format($this->salary_max);
         }
 
-        return null;
+        return 'Negotiable';
     }
 
-    // Accessor for company name (from employer relationship)
-    public function getCompanyAttribute()
+    // Check if job is still active for applications
+    public function isApplicationOpen()
     {
-        return $this->employer ? $this->employer->company_name : 'Company';
+        if ($this->application_deadline) {
+            return $this->application_deadline >= now() && $this->status === 'active';
+        }
+        return $this->status === 'active';
     }
 
-    // Increment job view count
-    public function incrementViews()
+    // Get days since posted
+    public function getDaysAgoAttribute()
     {
-        $this->increment('job_view');
-    }
-
-    // Helper method to get application count
-    public function getApplicationCountAttribute()
-    {
-        return $this->applications()->count();
+        return $this->created_at->diffForHumans();
     }
 }

@@ -58,4 +58,49 @@ Route::middleware('auth')->group(function () {
     Route::post('/jobs/{id}/apply', [JobController::class, 'applyForJob'])->name('jobs.apply');
 });
 
+// Update the employer routes section
+Route::prefix('employer')->name('employer.')->group(function () {
+    // These routes should NOT have any auth middleware
+    Route::get('/login', [App\Http\Controllers\Employer\AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [App\Http\Controllers\Employer\AuthController::class, 'login'])->name('login.submit');
+    Route::get('/register', [App\Http\Controllers\Employer\AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [App\Http\Controllers\Employer\AuthController::class, 'register'])->name('register.submit');
+    
+    // Logout route (only for authenticated employers)
+    Route::post('/logout', [App\Http\Controllers\Employer\AuthController::class, 'logout'])
+        ->name('logout')
+        ->middleware('auth:employer');
+    
+    // Protected employer routes
+    Route::middleware('auth:employer')->group(function () {
+        Route::get('/dashboard', [App\Http\Controllers\Employer\DashboardController::class, 'index'])->name('dashboard');
+        
+        // Jobs routes
+        Route::prefix('jobs')->name('jobs.')->group(function () {
+            Route::get('/', function() { 
+                return view('employer.jobs.index', ['jobs' => collect()]); 
+            })->name('index');
+            Route::get('/create', function() { 
+                return view('employer.jobs.create'); 
+            })->name('create');
+        });
+        
+        // Company profile routes
+        Route::prefix('company')->name('company.')->group(function () {
+            Route::get('/profile', function() { 
+                $employer = Auth::guard('employer')->user();
+                return view('employer.company.profile', compact('employer')); 
+            })->name('profile');
+        });
+        
+        // User profile routes
+        Route::prefix('user')->name('user.')->group(function () {
+            Route::get('/profile', function() { 
+                $employer = Auth::guard('employer')->user();
+                return view('employer.user.profile', compact('employer')); 
+            })->name('profile');
+        });
+    });
+});
+
 require __DIR__.'/auth.php';
