@@ -17,7 +17,7 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
                     
-                    <x-nav-link :href="route('employer.jobs.index')" :active="request()->routeIs('employer.jobs.*') || request()->is('employer/jobs*')">
+                    <x-nav-link :href="route('employer.jobs.index')" :active="request()->routeIs('employer.jobs.index')">
                         {{ __('Manage Jobs') }}
                     </x-nav-link>
 

@@ -30,7 +30,7 @@
         <script src="{{ asset('js/job-modal.js') }}" defer></script>
     </head>
     <body class="font-sans antialiased {{ auth()->check() ? 'authenticated' : 'guest' }}">
-        <div class="min-h-screen bg-gray-100">
+        <div class="min-h-screen bg-white">
             @include('layouts.navigation')
 
             <!-- Page Heading -->

@@ -115,7 +115,7 @@
     </section>
 
     <!-- Upgrade skills CTA -->
-    <section class="py-16">
+    <section class="py-16 bg-gray-100">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 p-8 sm:p-10 text-white shadow">
         <div class="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">

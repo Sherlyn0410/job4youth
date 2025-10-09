@@ -13,91 +13,80 @@ class Job extends Model
 
     protected $fillable = [
         'employer_id',
+        'admin_id',
         'title',
+        'location',
+        'job_type',
+        'specialization',
+        'education_level',
+        'salary_min',
+        'salary_max',
+        'salary_display',
         'job_overview',
         'responsibilities',
         'requirements',
         'skills',
-        'job_type',
-        'location',
-        'salary_min',
-        'salary_max',
-        'salary_display',
-        'education_level',
-        'experience_level',
-        'specialization',
-        'application_deadline',
         'status',
-        'featured'
+        'posted_date',
+        'job_view'
     ];
 
     protected $casts = [
-        'responsibilities' => 'array',
-        'requirements' => 'array',
-        'skills' => 'array',
-        'salary_min' => 'decimal:2',
-        'salary_max' => 'decimal:2',
         'salary_display' => 'boolean',
-        'application_deadline' => 'date',
-        'featured' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'posted_date' => 'datetime',
+        'skills' => 'array', // This ensures skills is always an array
     ];
+
+    // Add an accessor to safely handle skills
+    public function getSkillsAttribute($value)
+    {
+        if (is_null($value)) {
+            return [];
+        }
+        
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+        
+        return is_array($value) ? $value : [];
+    }
+
+    // Add a mutator to ensure skills are stored as JSON
+    public function setSkillsAttribute($value)
+    {
+        if (is_array($value)) {
+            $this->attributes['skills'] = json_encode($value);
+        } elseif (is_string($value)) {
+            // If it's already a JSON string, store as is
+            $this->attributes['skills'] = $value;
+        } else {
+            $this->attributes['skills'] = json_encode([]);
+        }
+    }
 
     // Relationship with employer
     public function employer()
     {
-        return $this->belongsTo(Employer::class, 'employer_id');
+        return $this->belongsTo(\App\Models\Employer::class, 'employer_id');
     }
 
     // Relationship with applications
     public function applications()
     {
-        return $this->hasMany(Application::class, 'job_post_id');
+        return $this->hasMany(\App\Models\Application::class, 'job_post_id');
     }
 
-    // Scope for active jobs
+    // Add back the active scope to filter only active/open jobs
     public function scopeActive($query)
     {
-        return $query->where('status', 'active');
+        return $query->whereIn('status', ['active', 'open', 'published']);
     }
 
-    // Scope for featured jobs
-    public function scopeFeatured($query)
+    // Increment job views
+    public function incrementViews()
     {
-        return $query->where('featured', true);
-    }
-
-    // Get formatted salary range
-    public function getSalaryRangeAttribute()
-    {
-        if (!$this->salary_display) {
-            return 'Undisclosed';
-        }
-
-        if ($this->salary_min && $this->salary_max) {
-            return 'RM ' . number_format($this->salary_min) . ' - RM ' . number_format($this->salary_max);
-        } elseif ($this->salary_min) {
-            return 'From RM ' . number_format($this->salary_min);
-        } elseif ($this->salary_max) {
-            return 'Up to RM ' . number_format($this->salary_max);
-        }
-
-        return 'Negotiable';
-    }
-
-    // Check if job is still active for applications
-    public function isApplicationOpen()
-    {
-        if ($this->application_deadline) {
-            return $this->application_deadline >= now() && $this->status === 'active';
-        }
-        return $this->status === 'active';
-    }
-
-    // Get days since posted
-    public function getDaysAgoAttribute()
-    {
-        return $this->created_at->diffForHumans();
+        $this->increment('job_view');
     }
 }
+

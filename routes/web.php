@@ -10,8 +10,9 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/jobs', [JobController::class, 'index'])->name('jobs.index');
-Route::get('/jobs/{id}', [JobController::class, 'show'])->name('jobs.show');
 Route::get('/jobs/{id}/details', [JobController::class, 'getJobDetails'])->name('jobs.details');
+Route::post('/jobs/{id}/apply', [JobController::class, 'applyForJob'])->name('jobs.apply');
+Route::post('/jobs/{id}/save', [JobController::class, 'saveJob'])->name('jobs.save');
 
 // Keep welcome as fallback for now
 Route::get('/welcome', function () {
@@ -49,15 +50,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Add these routes
-Route::get('/jobs', [JobController::class, 'index'])->name('jobs.index');
-Route::get('/jobs/{id}/details', [JobController::class, 'getJobDetails'])->name('jobs.details');
-
-Route::middleware('auth')->group(function () {
-    Route::post('/jobs/{id}/save', [JobController::class, 'saveJob'])->name('jobs.save');
-    Route::post('/jobs/{id}/apply', [JobController::class, 'applyForJob'])->name('jobs.apply');
-});
-
 // Update the employer routes section
 Route::prefix('employer')->name('employer.')->group(function () {
     // These routes should NOT have any auth middleware
@@ -77,12 +69,13 @@ Route::prefix('employer')->name('employer.')->group(function () {
         
         // Jobs routes
         Route::prefix('jobs')->name('jobs.')->group(function () {
-            Route::get('/', function() { 
-                return view('employer.jobs.index', ['jobs' => collect()]); 
-            })->name('index');
-            Route::get('/create', function() { 
-                return view('employer.jobs.create'); 
-            })->name('create');
+            Route::get('/', [App\Http\Controllers\Employer\JobController::class, 'index'])->name('index');
+            Route::get('/create', [App\Http\Controllers\Employer\JobController::class, 'create'])->name('create');
+            Route::post('/', [App\Http\Controllers\Employer\JobController::class, 'store'])->name('store');
+            Route::get('/{job}', [App\Http\Controllers\Employer\JobController::class, 'show'])->name('show');
+            Route::get('/{job}/edit', [App\Http\Controllers\Employer\JobController::class, 'edit'])->name('edit');
+            Route::put('/{job}', [App\Http\Controllers\Employer\JobController::class, 'update'])->name('update');
+            Route::delete('/{job}', [App\Http\Controllers\Employer\JobController::class, 'destroy'])->name('destroy');
         });
         
         // Company profile routes
