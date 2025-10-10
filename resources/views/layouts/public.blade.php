@@ -18,16 +18,13 @@
         <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.2/dist/full.min.css" rel="stylesheet" type="text/css" />
 
         <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-        
+        @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/jobs.js'])
+
         <!-- Alpine.js -->
         <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
         <!-- Bootstrap Icons -->
          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-         
-        <!-- Job Modal JavaScript -->
-        <script src="{{ asset('js/job-modal.js') }}" defer></script>
     </head>
     <body class="font-sans antialiased {{ auth()->check() ? 'authenticated' : 'guest' }}">
         <div class="min-h-screen bg-white">

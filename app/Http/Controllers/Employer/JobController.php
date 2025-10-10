@@ -9,12 +9,12 @@ use App\Models\Job;
 
 class JobController extends Controller
 {
-    public function index()
+    public function manage()
     {
         $employer = Auth::guard('employer')->user();
         $jobs = $employer->jobs()->latest()->paginate(10);
         
-        return view('employer.jobs.index', compact('jobs'));
+        return view('employer.jobs.manage', compact('jobs'));
     }
 
     public function create()
@@ -93,11 +93,11 @@ class JobController extends Controller
 
     public function update(Request $request, $id)
     {
-        return redirect()->route('employer.jobs.index')->with('success', 'Job updated successfully!');
+        return redirect()->route('employer.jobs.manage')->with('success', 'Job updated successfully!');
     }
 
     public function destroy($id)
     {
-        return redirect()->route('employer.jobs.index')->with('success', 'Job deleted successfully!');
+        return redirect()->route('employer.jobs.manage')->with('success', 'Job deleted successfully!');
     }
 }

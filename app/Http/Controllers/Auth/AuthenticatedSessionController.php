@@ -17,7 +17,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
-        return view('auth.login');
+        return view('auth.login-form');
     }
 
     /**
@@ -46,7 +46,8 @@ class AuthenticatedSessionController extends Controller
             $intendedUrl = $request->session()->get('url.intended', '/dashboard');
             
             // If coming from jobs page, redirect back to jobs
-            if (str_contains($request->headers->get('referer', ''), '/jobs')) {
+            if (str_contains($request->headers->get('referer', ''), '/jobs') || 
+                str_contains($intendedUrl, '/jobs')) {
                 return redirect()->route('jobs.index')->with('login_success', true);
             }
 

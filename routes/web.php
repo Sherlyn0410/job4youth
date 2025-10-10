@@ -69,7 +69,7 @@ Route::prefix('employer')->name('employer.')->group(function () {
         
         // Jobs routes
         Route::prefix('jobs')->name('jobs.')->group(function () {
-            Route::get('/', [App\Http\Controllers\Employer\JobController::class, 'index'])->name('index');
+            Route::get('/', [App\Http\Controllers\Employer\JobController::class, 'manage'])->name('manage');
             Route::get('/create', [App\Http\Controllers\Employer\JobController::class, 'create'])->name('create');
             Route::post('/', [App\Http\Controllers\Employer\JobController::class, 'store'])->name('store');
             Route::get('/{job}', [App\Http\Controllers\Employer\JobController::class, 'show'])->name('show');
