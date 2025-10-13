@@ -154,6 +154,9 @@ class JobController extends Controller
             // Check if user has applied (only if authenticated)
             $hasApplied = auth()->check() ? auth()->user()->hasAppliedFor($id) : false;
 
+            // Ensure skills are properly formatted
+            $skills = $job->skills; // This will use the accessor
+            
             // Return formatted job data for modal
             return response()->json([
                 'success' => true,
@@ -169,11 +172,10 @@ class JobController extends Controller
                     'salary_min' => $job->salary_min,
                     'salary_max' => $job->salary_max,
                     'salary_display' => $job->salary_display ?? true,
-                    'salary_range' => $job->salary_range,
                     'job_overview' => $job->job_overview,
                     'responsibilities' => $job->responsibilities,
                     'requirements' => $job->requirements,
-                    'skills' => $job->skills,
+                    'skills' => $skills, // Use the processed skills
                     'posted_date' => $job->posted_date ? $job->posted_date->diffForHumans() : $job->created_at->diffForHumans(),
                     'job_view' => $job->job_view ?? 0,
                     'has_applied' => $hasApplied,

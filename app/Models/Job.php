@@ -40,16 +40,41 @@ class Job extends Model
     // Add an accessor to safely handle skills
     public function getSkillsAttribute($value)
     {
-        if (is_null($value)) {
+        if (is_null($value) || $value === '') {
             return [];
         }
         
         if (is_string($value)) {
-            $decoded = json_decode($value, true);
-            return is_array($decoded) ? $decoded : [];
+            // Clean up malformed JSON strings
+            $cleanValue = $value;
+            
+            // Remove escaped quotes and fix malformed JSON
+            $cleanValue = str_replace('\\"', '"', $cleanValue);
+            $cleanValue = preg_replace('/^"(.*)"$/', '$1', $cleanValue); // Remove outer quotes
+            $cleanValue = trim($cleanValue);
+            
+            // Try to parse as JSON
+            if (str_starts_with($cleanValue, '[') && str_ends_with($cleanValue, ']')) {
+                $decoded = json_decode($cleanValue, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                    return array_filter($decoded, function($skill) {
+                        return !empty(trim($skill));
+                    });
+                }
+            }
+            
+            // Handle comma-separated string
+            if (str_contains($cleanValue, ',')) {
+                return array_filter(array_map('trim', explode(',', $cleanValue)));
+            }
+            
+            // Single skill as string
+            if (!empty(trim($cleanValue))) {
+                return [trim($cleanValue)];
+            }
         }
         
-        return is_array($value) ? $value : [];
+        return is_array($value) ? array_filter($value) : [];
     }
 
     // Add a mutator to ensure skills are stored as JSON

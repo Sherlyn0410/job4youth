@@ -17,7 +17,7 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
                     
-                    <x-nav-link :href="route('employer.jobs.index')" :active="request()->routeIs('employer.jobs.index')">
+                    <x-nav-link :href="route('employer.jobs.manage')" :active="request()->routeIs('employer.jobs.manage')">
                         {{ __('Manage Jobs') }}
                     </x-nav-link>
 
@@ -69,7 +69,7 @@
                             {{ __('Company Settings') }}
                         </x-dropdown-link>
                         
-                        <x-dropdown-link :href="route('employer.jobs.index')">
+                        <x-dropdown-link :href="route('employer.jobs.manage')">
                             {{ __('Manage Jobs') }}
                         </x-dropdown-link>
                         
@@ -118,7 +118,7 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
             
-            <x-responsive-nav-link :href="route('employer.jobs.index')" :active="request()->routeIs('employer.jobs.*') || request()->is('employer/jobs*')">
+            <x-responsive-nav-link :href="route('employer.jobs.manage')" :active="request()->routeIs('employer.jobs.*') || request()->is('employer/jobs*')">
                 {{ __('Manage Jobs') }}
             </x-responsive-nav-link>
 

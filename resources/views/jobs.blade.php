@@ -262,8 +262,8 @@
                     >
                         <div class="flex items-start gap-4">
                             <!-- Company Logo -->
-                            <div class="w-12 h-12 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0 border">
-                                <span class="text-blue-600 font-bold text-lg">
+                            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0 border">
+                                <span class="text-white font-bold text-lg">
                                     {{ $job->employer->company_name ? substr($job->employer->company_name, 0, 1) : 'C' }}
                                 </span>
                             </div>
@@ -341,12 +341,12 @@
                 </div>
 
                 <!-- RIGHT SIDE: Job Details -->
-                <div class="w-3/5 bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div class="w-3/5 bg-white rounded-xl border border-gray-200 overflow-hidden shadow-lg">
                     
                     <!-- Loading State -->
                     <div id="job-details-loading" class="flex justify-center items-center h-full">
                         <div class="text-center">
-                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <div class="w-16 h-16 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
                                 <i class="bi bi-briefcase text-2xl text-gray-400"></i>
                             </div>
                             <p class="text-gray-500">Select a job to view details</p>
@@ -357,128 +357,129 @@
                     <div id="job-details-content" class="h-full flex flex-col" style="display: none;">
                         
                         <!-- Scrollable Content Area -->
-                        <div class="flex-1 overflow-y-auto">
+                        <div class="flex-1 overflow-y-auto p-6 space-y-8">
                             
-                            <!-- Job Header (non-sticky) -->
-                            <div class="p-6 border-b border-gray-200">
+                            <!-- Job Header -->
+                            <div class="border-b border-gray-200 pb-6">
                                 <div class="flex items-start gap-4">
                                     <!-- Company Logo -->
-                                    <div class="w-16 h-16 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0 border">
-                                        <span id="details-company-logo" class="text-blue-600 font-bold text-xl"></span>
+                                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                                        <span id="details-company-logo" class="text-white font-bold text-xl"></span>
                                     </div>
                                     
                                     <!-- Job Info -->
                                     <div class="flex-1 min-w-0">
-                                        <h2 id="details-job-title" class="text-2xl font-bold text-gray-900 mb-1"></h2>
-                                        <p id="details-company-name" class="text-gray-600 font-medium mb-3"></p>
+                                        <h2 id="details-job-title" class="text-2xl font-bold text-gray-900 mb-2 leading-tight"></h2>
+                                        <p id="details-company-name" class="text-lg text-gray-600 font-medium mb-4"></p>
                                         
                                         <!-- Job Meta -->
                                         <div class="flex flex-wrap items-center gap-3">
-                                            <span id="details-location" class="bg-white text-gray-700 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
-                                                <i class="bi bi-geo-alt"></i>
+                                            <span id="details-location" class="bg-gray-50 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 border">
+                                                <i class="bi bi-geo-alt text-gray-500"></i>
                                             </span>
-                                            <span id="details-job-type" class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"></span>
-                                            <span id="details-salary" class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium"></span>
+                                            <span id="details-job-type" class="bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium border border-blue-200"></span>
+                                            <span id="details-salary" class="bg-green-50 text-green-700 px-3 py-2 rounded-lg text-sm font-medium border border-green-200"></span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Job Details Body -->
-                            <div class="p-6 space-y-6">
-                                
-                                <!-- Job Overview Section -->
-                                <div>
-                                    <h3 class="text-xl font-bold text-gray-900 mb-4">Job Overview</h3>
-                                    <div id="details-job-overview" class="text-gray-600 leading-relaxed"></div>
-                                </div>
+                            <!-- Job Overview Section -->
+                            <div class="bg-gray-50 p-6 rounded-xl">
+                                <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                                    <i class="bi bi-file-text mr-2 text-blue-600"></i>
+                                    Job Overview
+                                </h3>
+                                <div id="details-job-overview" class="text-gray-600 leading-relaxed prose prose-sm max-w-none"></div>
+                            </div>
 
-                                <!-- Responsibilities Section -->
-                                <div id="details-responsibilities-section" style="display: none;">
-                                    <h3 class="text-xl font-bold text-gray-900 mb-4">Responsibilities</h3>
-                                    <div id="details-responsibilities" class="text-gray-600 space-y-2">
-                                        <!-- Will be populated with bullet points -->
+                            <!-- Responsibilities Section -->
+                            <div id="details-responsibilities-section" class="bg-white border border-gray-200 rounded-xl p-6" style="display: none;">
+                                <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                                    <i class="bi bi-list-check mr-2 text-green-600"></i>
+                                    Key Responsibilities
+                                </h3>
+                                <div id="details-responsibilities" class="space-y-3">
+                                    <!-- Will be populated with styled bullet points -->
+                                </div>
+                            </div>
+
+                            <!-- Requirements Section -->
+                            <div id="details-requirements-section" class="bg-white border border-gray-200 rounded-xl p-6" style="display: none;">
+                                <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                                    <i class="bi bi-clipboard-check mr-2 text-orange-600"></i>
+                                    Requirements
+                                </h3>
+                                <div id="details-requirements" class="space-y-3">
+                                    <!-- Will be populated with styled bullet points -->
+                                </div>
+                            </div>
+
+                            <!-- Skills Section -->
+                            <div id="details-skills-section" class="bg-white border border-gray-200 rounded-xl p-6">
+                                <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                                    <i class="bi bi-gear mr-2 text-purple-600"></i>
+                                    Required Skills
+                                </h3>
+                                <div id="details-skills" class="flex flex-wrap gap-3">
+                                    <!-- Will be populated with enhanced skill badges -->
+                                </div>
+                            </div>
+
+                            <!-- Company Benefits Section -->
+                            <div id="details-benefits-section" class="bg-white border border-gray-200 rounded-xl p-6" style="display: none;">
+                                <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                                    <i class="bi bi-gift mr-2 text-green-600"></i>
+                                    Benefits & Perks
+                                </h3>
+                                <div id="details-benefits" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <!-- Will be populated with benefits -->
+                                </div>
+                            </div>
+
+                            <!-- About the Company Section -->
+                            <div id="details-about-company-section" class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl">
+                                <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                                    <i class="bi bi-building mr-2 text-blue-600"></i>
+                                    About the Company
+                                </h3>
+                                <div class="flex items-center gap-4 mb-4">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                                        <span id="company-logo-large" class="text-white font-bold text-lg"></span>
+                                    </div>
+                                    <div>
+                                        <h4 id="company-name-large" class="text-lg font-bold text-gray-900"></h4>
+                                        <p class="text-gray-600 text-sm">Technology Company</p>
                                     </div>
                                 </div>
-
-                                <!-- Requirements Section -->
-                                <div id="details-requirements-section" style="display: none;">
-                                    <h3 class="text-xl font-bold text-gray-900 mb-4">Requirements</h3>
-                                    <div id="details-requirements" class="text-gray-600 space-y-2">
-                                        <!-- Will be populated with bullet points -->
-                                    </div>
+                                <div id="details-about-company" class="text-gray-600 leading-relaxed prose prose-sm max-w-none">
+                                    <!-- Will be populated with company description -->
                                 </div>
+                            </div>
+                        </div>
 
-                                <!-- Skills Section -->
-                                <div id="details-skills-section">
-                                    <h3 class="text-xl font-bold text-gray-900 mb-4">Skills</h3>
-                                    <div id="details-skills" class="flex flex-wrap gap-2">
-                                        <!-- Will be populated with skill badges -->
-                                    </div>
-                                </div>
-
-                                <!-- Company Benefits Section -->
-                                <div id="details-benefits-section" style="display: none;">
-                                    <h3 class="text-xl font-bold text-gray-900 mb-4">Company Benefits</h3>
-                                    <div id="details-benefits" class="text-gray-600 space-y-2">
-                                        <!-- Will be populated with benefits list -->
-                                    </div>
-                                </div>
-
-                                <!-- About the Company Section -->
-                                <div id="details-about-company-section" style="display: none;">
-                                    <h3 class="text-xl font-bold text-gray-900 mb-4">About the Company</h3>
-                                    <div id="details-about-company" class="text-gray-600 leading-relaxed">
-                                        <!-- Will be populated with company description -->
-                                    </div>
-                                </div>
-
-                                <!-- Job Details Section -->
-                                <div>
-                                    <h3 class="text-xl font-bold text-gray-900 mb-4">Job Details</h3>
-                                    <div class="space-y-3">
-                                        <div id="details-specialization-row" class="flex justify-between" style="display: none;">
-                                            <span class="text-gray-600">Specialization:</span>
-                                            <span id="details-specialization" class="font-medium text-gray-900"></span>
-                                        </div>
-                                        <div id="details-education-row" class="flex justify-between" style="display: none;">
-                                            <span class="text-gray-600">Education Level:</span>
-                                            <span id="details-education" class="font-medium text-gray-900"></span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-600">Posted:</span>
-                                            <span id="details-posted-date" class="font-medium text-gray-900"></span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-600">Views:</span>
-                                            <span id="details-views" class="font-medium text-gray-900">0</span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-600">Applications:</span>
-                                            <span id="details-applications" class="font-medium text-gray-900">0</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Action Buttons (non-sticky, at bottom of content) -->
-                                <div class="pt-6 border-t border-gray-200">
-                                    <div class="flex gap-3">
-                                        <button 
-                                            id="save-job-btn"
-                                            onclick="saveJob()"
-                                            class="flex-1 px-6 py-3 border border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors"
-                                        >
-                                            <i class="bi bi-heart mr-2"></i>Save Job
-                                        </button>
-                                        <button 
-                                            id="apply-job-btn"
-                                            onclick="applyForJob()"
-                                            class="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-                                        >
-                                            <i class="bi bi-send mr-2"></i>Apply Now
-                                        </button>
-                                    </div>
-                                </div>
+                        <!-- Sticky Action Button at Bottom -->
+                        <div class="sticky bottom-0 bg-white border-t border-gray-200 p-6">
+                            <div class="flex gap-4">
+                                <button 
+                                    id="save-job-btn"
+                                    onclick="saveJob()"
+                                    class="flex-1 px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <i class="bi bi-heart"></i>
+                                    Save Job
+                                </button>
+                                <button 
+                                    id="apply-job-btn"
+                                    onclick="applyForJob()"
+                                    class="flex-2 px-8 py-3 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg"
+                                    style="background-color: #006EDC; flex: 2;"
+                                    onmouseover="this.style.backgroundColor='#005BB5'"
+                                    onmouseout="this.style.backgroundColor='#006EDC'"
+                                >
+                                    <i class="bi bi-send"></i>
+                                    Apply Now
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -493,6 +494,7 @@
             firstJobId: {{ $jobs->count() > 0 ? $jobs->first()->id : 'null' }},
             loginSuccess: {{ session('login_success') ? 'true' : 'false' }}
         };
+
     </script>
 
 </x-public-layout>
