@@ -55,4 +55,29 @@ class User extends Authenticatable
     {
         return $this->hasMany(Application::class);
     }
+
+    public function savedJobs()
+    {
+        return $this->hasMany(SavedJob::class);
+    }
+
+    // Helper method to check if user has saved a job
+    public function hasSavedJob($jobId)
+    {
+        return $this->savedJobs()->where('job_post_id', $jobId)->exists();
+    }
+
+    // Helper method to save a job
+    public function saveJob($jobId)
+    {
+        return $this->savedJobs()->firstOrCreate([
+            'job_post_id' => $jobId
+        ]);
+    }
+
+    // Helper method to unsave a job
+    public function unsaveJob($jobId)
+    {
+        return $this->savedJobs()->where('job_post_id', $jobId)->delete();
+    }
 }

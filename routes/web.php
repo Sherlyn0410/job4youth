@@ -13,6 +13,7 @@ Route::get('/jobs', [JobController::class, 'index'])->name('jobs.index');
 Route::get('/jobs/{id}/details', [JobController::class, 'getJobDetails'])->name('jobs.details');
 Route::post('/jobs/{id}/apply', [JobController::class, 'applyForJob'])->name('jobs.apply');
 Route::post('/jobs/{id}/save', [JobController::class, 'saveJob'])->name('jobs.save');
+Route::get('/jobs/{id}', [JobController::class, 'show'])->name('jobs.show');
 
 // Keep welcome as fallback for now
 Route::get('/welcome', function () {
@@ -26,13 +27,10 @@ Route::get('/dashboard', function () {
 
 // My Jobs routes (protected)
 Route::middleware('auth')->group(function () {
-    Route::get('/my-applications', function () {
-        return view('my-applications');
-    })->name('my-applications');
+    Route::get('/my-applications', [JobController::class, 'myApplications'])->name('my-applications');
+    Route::post('/applications/{id}/withdraw', [JobController::class, 'withdrawApplication'])->name('applications.withdraw');
     
-    Route::get('/saved-jobs', function () {
-        return view('saved-jobs');
-    })->name('saved-jobs');
+    Route::get('/saved-jobs', [JobController::class, 'savedJobs'])->name('saved-jobs');
 });
 
 // More section routes (public)

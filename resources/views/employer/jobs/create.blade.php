@@ -179,106 +179,229 @@
                         </div>
                     </div>
 
-                    <!-- Job Overview -->
+                    <!-- Job Overview with Word Count -->
                     <div>
                         <label for="job_overview" class="block text-sm font-medium text-gray-700 mb-2">
                             Job Overview <span class="text-red-500">*</span>
                         </label>
-                        <div x-data="{ content: '{{ old('job_overview') }}' }" class="relative">
+                        <div x-data="{ 
+                            content: '{{ old('job_overview') }}',
+                            wordLimit: 500,
+                            get wordCount() {
+                                return this.content.trim() === '' ? 0 : this.content.trim().split(/\s+/).length;
+                            },
+                            get isOverLimit() {
+                                return this.wordCount > this.wordLimit;
+                            }
+                        }" class="relative">
                             <textarea id="job_overview" 
                                     name="job_overview" 
                                     required
                                     rows="6"
                                     x-model="content"
-                                    class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500 resize-vertical"
+                                    :class="isOverLimit ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'"
+                                    class="w-full px-3 py-3 border rounded-lg bg-white text-gray-900 placeholder-gray-500 resize-vertical"
                                     placeholder="Add your job description..."></textarea>
+                            <div class="flex justify-between items-center mt-2">
+                                <p class="text-sm text-gray-500">Describe the role and company culture</p>
+                                <span :class="isOverLimit ? 'text-red-600' : wordCount > wordLimit * 0.9 ? 'text-yellow-600' : 'text-gray-500'" 
+                                      class="text-sm font-medium">
+                                    <span x-text="wordCount"></span>/<span x-text="wordLimit"></span> words
+                                </span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Responsibilities -->
+                    <!-- Responsibilities with Word Count -->
                     <div>
                         <label for="responsibilities" class="block text-sm font-medium text-gray-700 mb-2">
                             Responsibilities <span class="text-red-500">*</span>
                         </label>
-                        <div x-data="{ content: '{{ old('responsibilities') }}' }" class="relative">
+                        <div x-data="{ 
+                            content: '{{ old('responsibilities') }}',
+                            wordLimit: 750,
+                            get wordCount() {
+                                return this.content.trim() === '' ? 0 : this.content.trim().split(/\s+/).length;
+                            },
+                            get isOverLimit() {
+                                return this.wordCount > this.wordLimit;
+                            }
+                        }" class="relative">
                             <textarea id="responsibilities" 
                                     name="responsibilities" 
                                     required
                                     rows="6"
                                     x-model="content"
-                                    class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500 resize-vertical"
+                                    :class="isOverLimit ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'"
+                                    class="w-full px-3 py-3 border rounded-lg bg-white text-gray-900 placeholder-gray-500 resize-vertical"
                                     placeholder="Add your job responsibilities..."></textarea>
+                            <div class="flex justify-between items-center mt-2">
+                                <p class="text-sm text-gray-500">List key duties and daily tasks</p>
+                                <span :class="isOverLimit ? 'text-red-600' : wordCount > wordLimit * 0.9 ? 'text-yellow-600' : 'text-gray-500'" 
+                                      class="text-sm font-medium">
+                                    <span x-text="wordCount"></span>/<span x-text="wordLimit"></span> words
+                                </span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Requirements -->
+                    <!-- Requirements with Word Count -->
                     <div>
                         <label for="requirements" class="block text-sm font-medium text-gray-700 mb-2">
                             Requirements <span class="text-red-500">*</span>
                         </label>
-                        <div x-data="{ content: '{{ old('requirements') }}' }" class="relative">
+                        <div x-data="{ 
+                            content: '{{ old('requirements') }}',
+                            wordLimit: 500,
+                            get wordCount() {
+                                return this.content.trim() === '' ? 0 : this.content.trim().split(/\s+/).length;
+                            },
+                            get isOverLimit() {
+                                return this.wordCount > this.wordLimit;
+                            }
+                        }" class="relative">
                             <textarea id="requirements" 
                                     name="requirements" 
                                     required
                                     rows="6"
                                     x-model="content"
-                                    class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500 resize-vertical"
+                                    :class="isOverLimit ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'"
+                                    class="w-full px-3 py-3 border rounded-lg bg-white text-gray-900 placeholder-gray-500 resize-vertical"
                                     placeholder="Add your job requirements..."></textarea>
+                            <div class="flex justify-between items-center mt-2">
+                                <p class="text-sm text-gray-500">Specify qualifications and experience needed</p>
+                                <span :class="isOverLimit ? 'text-red-600' : wordCount > wordLimit * 0.9 ? 'text-yellow-600' : 'text-gray-500'" 
+                                      class="text-sm font-medium">
+                                    <span x-text="wordCount"></span>/<span x-text="wordLimit"></span> words
+                                </span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Skills -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Skills
-                        </label>
-                        <p class="text-sm text-gray-600 mb-3">Select at least 1 skill to continue (up to a maximum of 10).</p>
-                        
-                        <div x-data="{ 
-                            skills: [],
-                            newSkill: '',
-                            addSkill() {
-                                if (this.newSkill.trim() && this.skills.length < 10 && !this.skills.includes(this.newSkill.trim())) {
-                                    this.skills.push(this.newSkill.trim());
-                                    this.newSkill = '';
+                    <!-- Skills Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Soft Skills -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Soft Skills <span class="text-red-500">*</span>
+                            </label>
+                            <p class="text-sm text-gray-600 mb-3">Select at least 1 soft skill (max 5)</p>
+                            
+                            <div x-data="{ 
+                                skills: [],
+                                newSkill: '',
+                                maxSkills: 5,
+                                addSkill() {
+                                    if (this.newSkill.trim() && this.skills.length < this.maxSkills && !this.skills.includes(this.newSkill.trim())) {
+                                        this.skills.push(this.newSkill.trim());
+                                        this.newSkill = '';
+                                    }
+                                },
+                                removeSkill(index) {
+                                    this.skills.splice(index, 1);
                                 }
-                            },
-                            removeSkill(index) {
-                                this.skills.splice(index, 1);
-                            }
-                        }">
-                            <!-- Skills Input -->
-                            <div class="flex items-center space-x-2 mb-4">
-                                <input type="text" 
-                                    x-model="newSkill"
-                                    @keydown.enter.prevent="addSkill()"
-                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500"
-                                    placeholder="Enter relevant job skills">
-                                <button type="button" 
-                                        @click="addSkill()"
-                                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                                    <i class="bi bi-plus-lg"></i>
-                                </button>
-                            </div>
+                            }">
+                                <!-- Skills Input -->
+                                <div class="flex items-center space-x-2 mb-4">
+                                    <input type="text" 
+                                        x-model="newSkill"
+                                        @keydown.enter.prevent="addSkill()"
+                                        :disabled="skills.length >= maxSkills"
+                                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500 disabled:bg-gray-100"
+                                        placeholder="e.g., Communication, Leadership">
+                                    <button type="button" 
+                                            @click="addSkill()"
+                                            :disabled="skills.length >= maxSkills"
+                                            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </div>
 
-                            <!-- Skills Display -->
-                            <div class="flex flex-wrap gap-2" x-show="skills.length > 0">
-                                <template x-for="(skill, index) in skills" :key="index">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                                        <span x-text="skill"></span>
-                                        <button type="button" 
-                                                @click="removeSkill(index)"
-                                                class="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full text-blue-600 hover:bg-blue-200">
-                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    </span>
-                                </template>
-                            </div>
+                                <!-- Skills Display -->
+                                <div class="flex flex-wrap gap-2 mb-2" x-show="skills.length > 0">
+                                    <template x-for="(skill, index) in skills" :key="index">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                            <span x-text="skill"></span>
+                                            <button type="button" 
+                                                    @click="removeSkill(index)"
+                                                    class="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full text-green-600 hover:bg-green-200">
+                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                </svg>
+                                            </button>
+                                        </span>
+                                    </template>
+                                </div>
 
-                            <!-- Hidden input to submit skills -->
-                            <input type="hidden" name="skills" :value="JSON.stringify(skills)">
+                                <div class="text-sm text-gray-500">
+                                    <span x-text="skills.length"></span>/<span x-text="maxSkills"></span> skills added
+                                </div>
+
+                                <!-- Hidden input to submit skills -->
+                                <input type="hidden" name="soft_skills" :value="JSON.stringify(skills)">
+                            </div>
+                        </div>
+
+                        <!-- Hard Skills -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Hard Skills <span class="text-red-500">*</span>
+                            </label>
+                            <p class="text-sm text-gray-600 mb-3">Select at least 1 hard skill (max 8)</p>
+                            
+                            <div x-data="{ 
+                                skills: [],
+                                newSkill: '',
+                                maxSkills: 8,
+                                addSkill() {
+                                    if (this.newSkill.trim() && this.skills.length < this.maxSkills && !this.skills.includes(this.newSkill.trim())) {
+                                        this.skills.push(this.newSkill.trim());
+                                        this.newSkill = '';
+                                    }
+                                },
+                                removeSkill(index) {
+                                    this.skills.splice(index, 1);
+                                }
+                            }">
+                                <!-- Skills Input -->
+                                <div class="flex items-center space-x-2 mb-4">
+                                    <input type="text" 
+                                        x-model="newSkill"
+                                        @keydown.enter.prevent="addSkill()"
+                                        :disabled="skills.length >= maxSkills"
+                                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500 disabled:bg-gray-100"
+                                        placeholder="e.g., Python, Adobe Photoshop">
+                                    <button type="button" 
+                                            @click="addSkill()"
+                                            :disabled="skills.length >= maxSkills"
+                                            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Skills Display -->
+                                <div class="flex flex-wrap gap-2 mb-2" x-show="skills.length > 0">
+                                    <template x-for="(skill, index) in skills" :key="index">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                            <span x-text="skill"></span>
+                                            <button type="button" 
+                                                    @click="removeSkill(index)"
+                                                    class="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full text-blue-600 hover:bg-blue-200">
+                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                </svg>
+                                            </button>
+                                        </span>
+                                    </template>
+                                </div>
+
+                                <div class="text-sm text-gray-500">
+                                    <span x-text="skills.length"></span>/<span x-text="maxSkills"></span> skills added
+                                </div>
+
+                                <!-- Hidden input to submit skills -->
+                                <input type="hidden" name="hard_skills" :value="JSON.stringify(skills)">
+                            </div>
                         </div>
                     </div>
 
@@ -302,5 +425,4 @@
             </div>
         </div>
     </div>
-    
 </x-employer-layout>

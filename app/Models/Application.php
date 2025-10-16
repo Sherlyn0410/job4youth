@@ -39,6 +39,12 @@ class Application extends Model
         return $this->belongsTo(Job::class, 'job_post_id');
     }
 
+    // Add alias for job relationship to match the eager loading
+    public function job()
+    {
+        return $this->belongsTo(Job::class, 'job_post_id');
+    }
+
     // Scopes
     public function scopeSubmitted($query)
     {
@@ -53,5 +59,20 @@ class Application extends Model
     public function scopeRejected($query)
     {
         return $query->where('status', 'rejected');
+    }
+
+    public function scopeWithdrawn($query)
+    {
+        return $query->where('status', 'withdrawn');
+    }
+
+    public function scopeReviewed($query)
+    {
+        return $query->where('status', 'reviewed');
+    }
+
+    public function scopeInterviewed($query)
+    {
+        return $query->where('status', 'interviewed');
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Job;
 use App\Models\Application;
+use App\Models\SavedJob;
 
 class JobController extends Controller
 {
@@ -133,12 +134,15 @@ class JobController extends Controller
 
     public function show($id)
     {
-        $job = Job::active()->with('employer')->findOrFail($id);
-        
-        // Increment view count
-        $job->incrementViews();
-        
-        return view('job-details', compact('job'));
+        try {
+            $job = Job::active()->with('employer')->findOrFail($id);
+            
+            // Redirect to jobs index with the job ID to open the modal
+            return redirect()->route('jobs.index', ['job' => $id]);
+            
+        } catch (\Exception $e) {
+            return redirect()->route('jobs.index')->with('error', 'Job not found.');
+        }
     }
 
     // API endpoint for modal data
@@ -151,8 +155,9 @@ class JobController extends Controller
             // Increment view count
             $job->incrementViews();
 
-            // Check if user has applied (only if authenticated)
+            // Check if user has applied and saved (only if authenticated)
             $hasApplied = auth()->check() ? auth()->user()->hasAppliedFor($id) : false;
+            $hasSaved = auth()->check() ? auth()->user()->hasSavedJob($id) : false;
 
             // Ensure skills are properly formatted
             $skills = $job->skills; // This will use the accessor
@@ -175,10 +180,11 @@ class JobController extends Controller
                     'job_overview' => $job->job_overview,
                     'responsibilities' => $job->responsibilities,
                     'requirements' => $job->requirements,
-                    'skills' => $skills, // Use the processed skills
+                    'skills' => $skills,
                     'posted_date' => $job->posted_date ? $job->posted_date->diffForHumans() : $job->created_at->diffForHumans(),
                     'job_view' => $job->job_view ?? 0,
                     'has_applied' => $hasApplied,
+                    'has_saved' => $hasSaved,
                     'application_count' => $job->applications()->count()
                 ]
             ]);
@@ -235,19 +241,108 @@ class JobController extends Controller
             $job = Job::active()->findOrFail($id);
             $user = auth()->user();
             
-            // You'll need to create a saved_jobs table and relationship
-            // For now, just return success
+            // Check if job is already saved
+            if ($user->hasSavedJob($id)) {
+                // Unsave the job
+                $user->unsaveJob($id);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Job removed from saved jobs',
+                    'action' => 'unsaved'
+                ]);
+            } else {
+                // Save the job
+                $user->saveJob($id);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Job saved successfully',
+                    'action' => 'saved'
+                ]);
+            }
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error saving job: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Add this method to your existing JobController
+    public function myApplications()
+    {
+        $user = auth()->user();
+        
+        // Get all applications by the authenticated user with related job and employer data
+        // Exclude withdrawn applications
+        $applications = Application::with(['job.employer'])
+            ->where('user_id', $user->id)
+            ->where('status', '!=', 'withdrawn') // Exclude withdrawn applications
+            ->orderBy('apply_date', 'desc')
+            ->paginate(10);
+            
+        return view('my-applications', compact('applications'));
+    }
+
+    // Add this method to your existing JobController
+    public function withdrawApplication($applicationId)
+    {
+        try {
+            $application = Application::findOrFail($applicationId);
+            
+            // Check if the application belongs to the authenticated user
+            if ($application->user_id !== auth()->id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized action'
+                ], 403);
+            }
+            
+            // Check if application can be withdrawn (only submitted applications)
+            if ($application->status !== 'submitted') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This application cannot be withdrawn'
+                ], 400);
+            }
+            
+            // Update application status to withdrawn
+            $application->update(['status' => 'withdrawn']);
             
             return response()->json([
                 'success' => true,
-                'message' => 'Job saved successfully'
+                'message' => 'Application withdrawn successfully'
             ]);
             
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error saving job'
+                'message' => 'Error withdrawing application: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    // Update this method in your existing JobController
+    public function savedJobs()
+    {
+        $user = auth()->user();
+        
+        // Get all saved jobs by the authenticated user with related job and employer data
+        $savedJobs = SavedJob::with(['job.employer'])
+            ->where('user_id', $user->id)
+            ->whereHas('job', function($query) {
+                $query->where('status', 'open'); // Only show active jobs
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+            
+        // Add application status to each saved job
+        $savedJobs->getCollection()->transform(function ($savedJob) use ($user) {
+            $savedJob->job->has_applied = $user->hasAppliedFor($savedJob->job->id);
+            $savedJob->created_at_human = $savedJob->created_at->diffForHumans();
+            return $savedJob;
+        });
+            
+        return view('saved-jobs', compact('savedJobs'));
     }
 }
