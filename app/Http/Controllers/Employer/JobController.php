@@ -34,27 +34,32 @@ class JobController extends Controller
             'salary_min' => 'nullable|numeric|min:0',
             'salary_max' => 'nullable|numeric|min:0|gte:salary_min',
             'salary_display' => 'boolean',
-            'job_overview' => 'required|string',
-            'responsibilities' => 'required|string',
-            'requirements' => 'required|string',
-            'skills' => 'required|string',
+            'job_overview' => 'required|string|max:1000',
+            'responsibilities' => 'required|string|max:1500',
+            'requirements' => 'required|string|max:1000',
+            'soft_skills' => 'required|string',    // Updated from 'skills'
+            'hard_skills' => 'required|string',    // New field
         ]);
 
         // Get the authenticated employer
         $employer = Auth::guard('employer')->user();
 
         // Parse skills from JSON
-        $skills = json_decode($request->skills, true) ?? [];
+        $softSkills = json_decode($request->soft_skills, true) ?? [];
+        $hardSkills = json_decode($request->hard_skills, true) ?? [];
         
-        // Validate skills array
-        if (empty($skills) || count($skills) > 10) {
-            return back()->withErrors(['skills' => 'Please select at least 1 skill and maximum 10 skills.'])->withInput();
+        // Validate skills arrays
+        if (empty($softSkills) || count($softSkills) > 10) {
+            return back()->withErrors(['soft_skills' => 'Please select at least 1 soft skill and maximum 10 skills.'])->withInput();
         }
 
-        // Create the job - only using fields that exist in the database
+        if (empty($hardSkills) || count($hardSkills) > 10) {
+            return back()->withErrors(['hard_skills' => 'Please select at least 1 hard skill and maximum 10 skills.'])->withInput();
+        }
+
+        // Create the job
         $job = new Job();
         $job->employer_id = $employer->id;
-        // Removed company_name and company_logo as they don't exist in the table
         $job->title = $validatedData['title'];
         $job->location = $validatedData['location'];
         $job->job_type = $validatedData['job_type'];
@@ -66,7 +71,8 @@ class JobController extends Controller
         $job->job_overview = $validatedData['job_overview'];
         $job->responsibilities = $validatedData['responsibilities'];
         $job->requirements = $validatedData['requirements'];
-        $job->skills = json_encode($skills);
+        $job->soft_skills = json_encode($softSkills);      // Updated
+        $job->hard_skills = json_encode($hardSkills);      // New
         $job->status = 'pending';
         $job->posted_date = now();
         
