@@ -2,7 +2,10 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\JobController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CheckoutController;
 use Illuminate\Support\Facades\Route;
+
 
 // Public routes - accessible to everyone
 Route::get('/', function () {
@@ -29,7 +32,7 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/my-applications', [JobController::class, 'myApplications'])->name('my-applications');
     Route::post('/applications/{id}/withdraw', [JobController::class, 'withdrawApplication'])->name('applications.withdraw');
-    
+
     Route::get('/saved-jobs', [JobController::class, 'savedJobs'])->name('saved-jobs');
 });
 
@@ -48,6 +51,23 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Skill Development Route
+Route::get('/skill-development', [CourseController::class, 'index'])->name('skill-development');
+Route::get('/skill-development/search', [CourseController::class, 'search'])->name('skill-development.search');
+
+Route::get('/skill-development/{slug}', [CourseController::class, 'show'])->name('skill-development.show');
+
+Route::post('/checkout/{id}', [CheckoutController::class, 'checkout'])->name('stripe.checkout');
+Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('stripe.success');
+Route::get('/checkout/cancel', [CheckoutController::class, 'cancel'])->name('stripe.cancel');
+
+Route::get('/learning-activities', [CourseController::class, 'learningActivities'])
+    ->middleware('auth')
+    ->name('learning.activities');
+
+
+
+
 // Update the employer routes section
 Route::prefix('employer')->name('employer.')->group(function () {
     // These routes should NOT have any auth middleware
@@ -55,16 +75,16 @@ Route::prefix('employer')->name('employer.')->group(function () {
     Route::post('/login', [App\Http\Controllers\Employer\AuthController::class, 'login'])->name('login.submit');
     Route::get('/register', [App\Http\Controllers\Employer\AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [App\Http\Controllers\Employer\AuthController::class, 'register'])->name('register.submit');
-    
+
     // Logout route (only for authenticated employers)
     Route::post('/logout', [App\Http\Controllers\Employer\AuthController::class, 'logout'])
         ->name('logout')
         ->middleware('auth:employer');
-    
+
     // Protected employer routes
     Route::middleware('auth:employer')->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Employer\DashboardController::class, 'index'])->name('dashboard');
-        
+
         // Jobs routes
         Route::prefix('jobs')->name('jobs.')->group(function () {
             Route::get('/', [App\Http\Controllers\Employer\JobController::class, 'manage'])->name('manage');
@@ -75,23 +95,23 @@ Route::prefix('employer')->name('employer.')->group(function () {
             Route::put('/{job}', [App\Http\Controllers\Employer\JobController::class, 'update'])->name('update');
             Route::delete('/{job}', [App\Http\Controllers\Employer\JobController::class, 'destroy'])->name('destroy');
         });
-        
+
         // Company profile routes
         Route::prefix('company')->name('company.')->group(function () {
-            Route::get('/profile', function() { 
+            Route::get('/profile', function () {
                 $employer = Auth::guard('employer')->user();
-                return view('employer.company.profile', compact('employer')); 
+                return view('employer.company.profile', compact('employer'));
             })->name('profile');
         });
-        
+
         // User profile routes
         Route::prefix('user')->name('user.')->group(function () {
-            Route::get('/profile', function() { 
+            Route::get('/profile', function () {
                 $employer = Auth::guard('employer')->user();
-                return view('employer.user.profile', compact('employer')); 
+                return view('employer.user.profile', compact('employer'));
             })->name('profile');
         });
     });
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

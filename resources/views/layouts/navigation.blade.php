@@ -15,18 +15,18 @@
                     <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
                         {{ __('Home') }}
                     </x-nav-link>
-                    
+
                     @auth
-                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                            {{ __('Dashboard') }}
-                        </x-nav-link>
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                        {{ __('Dashboard') }}
+                    </x-nav-link>
                     @endauth
-                    
+
                     <!-- Updated Jobs Navigation Link -->
                     <x-nav-link :href="route('jobs.index')" :active="request()->routeIs('jobs.*') || request()->is('jobs*')">
                         {{ __('Job Search') }}
                     </x-nav-link>
-                    
+
                     <!-- My Jobs Dropdown -->
                     <x-dropdown align="left" width="48">
                         <x-slot name="trigger">
@@ -42,20 +42,20 @@
 
                         <x-slot name="content">
                             @auth
-                                <x-dropdown-link :href="route('my-applications')">
-                                    {{ __('My Applications') }}
-                                </x-dropdown-link>
-                                <x-dropdown-link :href="route('saved-jobs')">
-                                    {{ __('Saved Jobs') }}
-                                </x-dropdown-link>
+                            <x-dropdown-link :href="route('my-applications')">
+                                {{ __('My Applications') }}
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('saved-jobs')">
+                                {{ __('Saved Jobs') }}
+                            </x-dropdown-link>
                             @else
-                                <button @click="$dispatch('open-modal', 'login')" class="block w-full text-left px-4 py-2 text-md text-gray-700 hover:bg-gray-100 rounded-md">
-                                    {{ __('Login to Access') }}
-                                </button>
+                            <button @click="$dispatch('open-modal', 'login')" class="block w-full text-left px-4 py-2 text-md text-gray-700 hover:bg-gray-100 rounded-md">
+                                {{ __('Login to Access') }}
+                            </button>
                             @endauth
                         </x-slot>
                     </x-dropdown>
-                    
+
                     <!-- More Dropdown -->
                     <x-dropdown align="left" width="56">
                         <x-slot name="trigger">
@@ -84,55 +84,61 @@
             <!-- Right Side Navigation -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 @guest
-                    <div class="flex space-x-4">
-                        <button @click="$dispatch('open-modal', 'login')" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-md font-medium">
-                            {{ __('Login') }}
-                        </button>
-                        <button @click="$dispatch('open-modal', 'register')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-md font-medium">
-                            {{ __('Register') }}
-                        </button>
-                        
-                        <a href="{{ route('employer.login') }}" class="text-blue-600 hover:text-blue-700 px-4 py-2 rounded-md text-md font-medium transition-colors">
-                            {{ __('Employer Site') }}
-                        </a>
-                    </div>
-                @else
-                    <!-- User Dropdown -->
-                    <x-dropdown align="right" width="48">
-                        <x-slot name="trigger">
-                            <button class="inline-flex items-center px-3 py-2 border border-transparent text-md leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                                <div>{{ Auth::user()->name }}</div>
+                <div class="flex space-x-4">
+                    <button @click="$dispatch('open-modal', 'login')" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-md font-medium">
+                        {{ __('Login') }}
+                    </button>
+                    <button @click="$dispatch('open-modal', 'register')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-md font-medium">
+                        {{ __('Register') }}
+                    </button>
 
-                                <div class="ms-1">
-                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                            </button>
-                        </x-slot>
-
-                        <x-slot name="content">
-                            <x-dropdown-link :href="route('profile.edit')">
-                                {{ __('Profile') }}
-                            </x-dropdown-link>
-
-                            <!-- Authentication -->
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-
-                                <x-dropdown-link :href="route('logout')"
-                                        onclick="event.preventDefault();
-                                                    this.closest('form').submit();">
-                                    {{ __('Log Out') }}
-                                </x-dropdown-link>
-                            </form>
-                        </x-slot>
-                    </x-dropdown>
-                    
-                    <!-- ADD THIS: Employer Site Button for logged in users too -->
-                    <a href="{{ route('employer.login') }}" class="ml-4 text-blue-600 hover:text-blue-700 px-4 py-2 rounded-md text-md font-medium transition-colors flex items-center gap-2">
+                    <a href="{{ route('employer.login') }}" class="text-blue-600 hover:text-blue-700 px-4 py-2 rounded-md text-md font-medium transition-colors">
                         {{ __('Employer Site') }}
                     </a>
+                </div>
+                @else
+                <!-- User Dropdown -->
+                <x-dropdown align="right" width="48">
+                    <x-slot name="trigger">
+                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-md leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                            <div>{{ Auth::user()->name }}</div>
+
+                            <div class="ms-1">
+                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </button>
+                    </x-slot>
+
+                    <x-slot name="content">
+                        @auth
+                        <x-dropdown-link :href="route('learning.activities')">
+                            My Learning Activities
+                        </x-dropdown-link>
+                        @endauth
+
+                        <x-dropdown-link :href="route('profile.edit')">
+                            {{ __('Profile') }}
+                        </x-dropdown-link>
+
+                        <!-- Authentication -->
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+
+                            <x-dropdown-link :href="route('logout')"
+                                onclick="event.preventDefault();
+                                                    this.closest('form').submit();">
+                                {{ __('Log Out') }}
+                            </x-dropdown-link>
+                        </form>
+                    </x-slot>
+                </x-dropdown>
+
+                <!-- ADD THIS: Employer Site Button for logged in users too -->
+                <a href="{{ route('employer.login') }}" class="ml-4 text-blue-600 hover:text-blue-700 px-4 py-2 rounded-md text-md font-medium transition-colors flex items-center gap-2">
+                    {{ __('Employer Site') }}
+                </a>
                 @endguest
             </div>
 
@@ -154,35 +160,35 @@
             <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
                 {{ __('Home') }}
             </x-responsive-nav-link>
-            
+
             @auth
-                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                    {{ __('Dashboard') }}
-                </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                {{ __('Dashboard') }}
+            </x-responsive-nav-link>
             @endauth
-            
+
             <!-- Updated Mobile Jobs Navigation Link -->
             <x-responsive-nav-link :href="route('jobs.index')" :active="request()->routeIs('jobs.*') || request()->is('jobs*')">
                 {{ __('Search Jobs') }}
             </x-responsive-nav-link>
-            
+
             <!-- My Jobs Mobile Section -->
             <div class="border-t border-gray-200 pt-2">
                 <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">My Jobs</div>
                 @auth
-                    <x-responsive-nav-link :href="route('my-applications')" class="pl-8">
-                        {{ __('My Applications') }}
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('saved-jobs')" class="pl-8">
-                        {{ __('Saved Jobs') }}
-                    </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('my-applications')" class="pl-8">
+                    {{ __('My Applications') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('saved-jobs')" class="pl-8">
+                    {{ __('Saved Jobs') }}
+                </x-responsive-nav-link>
                 @else
-                    <button @click="$dispatch('open-modal', 'login')" class="block w-full text-left pl-8 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition duration-150 ease-in-out">
-                        {{ __('Login to Access') }}
-                    </button>
+                <button @click="$dispatch('open-modal', 'login')" class="block w-full text-left pl-8 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition duration-150 ease-in-out">
+                    {{ __('Login to Access') }}
+                </button>
                 @endauth
             </div>
-            
+
             <!-- More Mobile Section -->
             <div class="border-t border-gray-200 pt-2">
                 <div class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">More</div>
@@ -192,7 +198,7 @@
                 <x-responsive-nav-link :href="route('career-guidance')" class="pl-8">
                     {{ __('Career Guidance Tools') }}
                 </x-responsive-nav-link>
-                
+
                 <!-- ADD THIS: Mobile Employer Site Link -->
                 <a href="{{ route('employer.login') }}" class="block pl-8 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-green-600 hover:text-green-800 hover:bg-green-50 hover:border-green-300 focus:outline-none focus:text-green-800 focus:bg-green-50 focus:border-green-300 transition duration-150 ease-in-out">
                     <i class="bi bi-building mr-2"></i>
@@ -204,36 +210,36 @@
         <!-- Responsive Auth/User Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
             @guest
-                <div class="space-y-1">
-                    <button @click="$dispatch('open-modal', 'login')" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                        {{ __('Login') }}
-                    </button>
-                    <button @click="$dispatch('open-modal', 'register')" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                        {{ __('Register') }}
-                    </button>
-                </div>
+            <div class="space-y-1">
+                <button @click="$dispatch('open-modal', 'login')" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                    {{ __('Login') }}
+                </button>
+                <button @click="$dispatch('open-modal', 'register')" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                    {{ __('Register') }}
+                </button>
+            </div>
             @else
-                <div class="px-4">
-                    <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                    <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
-                </div>
+            <div class="px-4">
+                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
+                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+            </div>
 
-                <div class="mt-3 space-y-1">
-                    <x-responsive-nav-link :href="route('profile.edit')">
-                        {{ __('Profile') }}
-                    </x-responsive-nav-link>
+            <div class="mt-3 space-y-1">
+                <x-responsive-nav-link :href="route('profile.edit')">
+                    {{ __('Profile') }}
+                </x-responsive-nav-link>
 
-                    <!-- Authentication -->
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
+                <!-- Authentication -->
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
 
-                        <x-responsive-nav-link :href="route('logout')"
-                                onclick="event.preventDefault();
+                    <x-responsive-nav-link :href="route('logout')"
+                        onclick="event.preventDefault();
                                             this.closest('form').submit();">
-                            {{ __('Log Out') }}
-                        </x-responsive-nav-link>
-                    </form>
-                </div>
+                        {{ __('Log Out') }}
+                    </x-responsive-nav-link>
+                </form>
+            </div>
             @endauth
         </div>
     </div>

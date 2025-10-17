@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Course extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'title',
+        'description',
+        'image_url',
+        'price',
+        'level',
+        'type',
+        'learning_hours',
+        'perks',
+    ];
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class)
+            ->withPivot('purchased_at')
+            ->withTimestamps();
+    }
+}

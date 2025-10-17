@@ -56,6 +56,13 @@ class User extends Authenticatable
         return $this->hasMany(Application::class);
     }
 
+    public function courses()
+    {
+        return $this->belongsToMany(related: Course::class)
+            ->withPivot('purchased_at')
+            ->withTimestamps();
+    }
+
     public function savedJobs()
     {
         return $this->hasMany(SavedJob::class);
