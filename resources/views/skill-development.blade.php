@@ -38,7 +38,7 @@
 
 
             {{-- === SECTION 3: Dynamic Courses === --}}
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white overflow-hidden shadow-xs sm:rounded-lg">
                 <div class="p-4 text-gray-900">
 
                     @if ($courses->isEmpty())

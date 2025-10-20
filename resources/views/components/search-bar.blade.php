@@ -2,7 +2,7 @@
         <div class="flex items-center bg-white rounded-md shadow-md overflow w-full border border-gray-200 h-14">
 
             <!-- Search Icon + Input -->
-            <div class="flex items-center flex-grow px-4">
+            <div class="flex items-center grow px-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-[#FFA500] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
@@ -10,7 +10,7 @@
                     type="text"
                     name="query"
                     placeholder="Search courses..."
-                    class="w-full outline-none border-none focus:ring-0 text-gray-700 placeholder-gray-400"
+                    class="w-full outline-hidden border-none focus:ring-0 text-gray-700 placeholder-gray-400"
                     value="{{ request('query') }}" />
             </div>
 
@@ -19,7 +19,7 @@
                 <button
                     @click="open = !open"
                     type="button"
-                    class="px-4 py-2 h-full bg-white text-gray-700  hover:bg-gray-100 flex items-center space-x-2 border-l border-gray-200 shadow-sm">
+                    class="px-4 py-2 h-full bg-white text-gray-700  hover:bg-gray-100 flex items-center space-x-2 border-l border-gray-200 shadow-xs">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#FFA500]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L14 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 018 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
@@ -47,7 +47,7 @@
                     <!-- Level Filter -->
                     <div>
                         <label class="block text-gray-600 font-medium mb-1">Level</label>
-                        <select name="level" class="w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <select name="level" class="w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-hidden focus:ring-1 focus:ring-blue-500">
                             <option value="">All Levels</option>
                             <option value="Beginner" {{ request('level') == 'Beginner' ? 'selected' : '' }}>Beginner</option>
                             <option value="Intermediate" {{ request('level') == 'Intermediate' ? 'selected' : '' }}>Intermediate</option>
@@ -58,7 +58,7 @@
                     <!-- Price Filter -->
                     <div>
                         <label class="block text-gray-600 font-medium mb-1">Price</label>
-                        <select name="price" class="w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <select name="price" class="w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-hidden focus:ring-1 focus:ring-blue-500">
                             <option value="">All Prices</option>
                             <option value="0-50" {{ request('price') == '0-50' ? 'selected' : '' }}>0 - 50 RM</option>
                             <option value="51-100" {{ request('price') == '51-100' ? 'selected' : '' }}>51 - 100 RM</option>
@@ -69,7 +69,7 @@
                     <!-- Learning Hours Filter -->
                     <div>
                         <label class="block text-gray-600 font-medium mb-1">Learning Hours</label>
-                        <select name="learning_hours" class="w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <select name="learning_hours" class="w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-hidden focus:ring-1 focus:ring-blue-500">
                             <option value="">Any</option>
                             <option value="0-5" {{ request('learning_hours') == '0-5' ? 'selected' : '' }}>0 - 5 hours</option>
                             <option value="6-10" {{ request('learning_hours') == '6-10' ? 'selected' : '' }}>6 - 10 hours</option>

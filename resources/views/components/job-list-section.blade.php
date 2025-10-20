@@ -40,7 +40,7 @@
             >
                 <div class="flex items-start gap-4">
                     <!-- Company Logo -->
-                    <div class="w-12 h-12 bg-gradient-to-br from-blue-50 to-indigo-200 rounded-lg flex items-center justify-center flex-shrink-0 border">
+                    <div class="w-12 h-12 bg-linear-to-br from-blue-50 to-indigo-200 rounded-lg flex items-center justify-center shrink-0 border">
                         @if($job->employer->logo)
                             <img src="{{ asset('storage/' . $job->employer->logo) }}" alt="{{ $job->employer->company_name }}" class="w-full h-full object-cover rounded-lg">
                         @else
@@ -57,7 +57,7 @@
                             <h3 class="text-lg font-bold text-gray-900 truncate flex-1 mr-4">
                                 {{ $job->title }}
                             </h3>
-                            <p class="text-sm text-gray-500 flex-shrink-0">
+                            <p class="text-sm text-gray-500 shrink-0">
                                 @if($detailsType === 'application')
                                     Applied {{ $item->apply_date ? $item->apply_date->diffForHumans() : '' }}
                                 @elseif($detailsType === 'saved-job')
@@ -93,19 +93,19 @@
                         <!-- Job Details -->
                         <div class="flex flex-wrap items-center gap-3 mb-3">
                             @if($job->location)
-                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-sm text-sm">
                                 {{ $job->location }}
                             </span>
                             @endif
                             
                             @if($job->job_type)
-                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-sm text-sm">
                                 {{ $job->job_type }}
                             </span>
                             @endif
                             
                             @if($job->salary_display && $job->salary_min && $job->salary_max)
-                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-sm text-sm">
                                 RM {{ number_format($job->salary_min) }} - {{ number_format($job->salary_max) }}
                             </span>
                             @endif
@@ -174,7 +174,7 @@
         <!-- Loading State -->
         <div id="{{ $detailsType }}-details-loading" class="flex justify-center items-center h-full">
             <div class="text-center">
-                <div class="w-16 h-16 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                <div class="w-16 h-16 bg-linear-to-br from-blue-50 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
                     @if($detailsType === 'saved-job')
                         <i class="bi bi-heart text-2xl text-gray-400"></i>
                     @else
@@ -203,7 +203,7 @@
                 <div class="border-b border-gray-200 pb-6">
                     <div class="flex items-start gap-4">
                         <!-- Company Logo -->
-                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                        <div class="w-16 h-16 bg-linear-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shrink-0 shadow-lg">
                             <span id="details-company-logo" class="text-white font-bold text-xl"></span>
                         </div>
                         

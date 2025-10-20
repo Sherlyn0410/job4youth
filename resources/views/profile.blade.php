@@ -4,13 +4,13 @@
             <div class="flex gap-4 h-screen" style="height: calc(100vh - 130px);">
                 
                 <!-- Left Sidebar - Profile Header (Sticky) -->
-                <div class="w-1/3 flex-shrink-0">
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden sticky top-8">
+                <div class="w-1/3 shrink-0">
+                    <div class="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden sticky top-8">
                         <div class="p-6">
                             <!-- Profile Image with Upload -->
                             <div class="flex justify-center mb-6" x-data="{ showUpload: false }">
                                 <div class="relative">
-                                    <div class="w-24 h-24 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center overflow-hidden">
+                                    <div class="w-24 h-24 bg-linear-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center overflow-hidden">
                                         @if(auth()->user()->profile_picture)
                                             <img src="{{ auth()->user()->profile_picture_url }}" 
                                                  alt="{{ auth()->user()->name }}" 
@@ -108,7 +108,7 @@
                             <!-- Contact Information -->
                             <div class="space-y-3 text-sm text-gray-600 mb-6">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                                         </svg>
@@ -116,7 +116,7 @@
                                     <span>{{ auth()->user()->phone ?? '+60173492734' }}</span>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                         </svg>
@@ -124,7 +124,7 @@
                                     <span>{{ auth()->user()->email ?? 'jennytan03@gmail.com' }}</span>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -150,7 +150,7 @@
                     <div class="space-y-6">
                         
                         <!-- Resume Section -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden" 
+                        <div class="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden" 
                              x-data="{ 
                                  showAddResume: false,
                                  resumes: [
@@ -183,7 +183,7 @@
                                                 <div>
                                                     <div class="flex items-center gap-2">
                                                         <span class="font-medium text-gray-900" x-text="resume.name"></span>
-                                                        <span x-show="resume.isDefault" class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">Default</span>
+                                                        <span x-show="resume.isDefault" class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-sm">Default</span>
                                                     </div>
                                                     <p class="text-sm text-gray-600" x-show="resume.isVisible">This resume is visible to employers.</p>
                                                 </div>
@@ -241,7 +241,7 @@
 
                                         <!-- Make Default Checkbox -->
                                         <label class="flex items-center mb-6">
-                                            <input type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                            <input type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded-sm">
                                             <span class="ml-2 text-sm text-gray-700">Make this my default resume</span>
                                         </label>
 
@@ -261,7 +261,7 @@
                         </div>
 
                         <!-- Work Experience Section -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden">
                             <div class="p-6">
                                 <div class="flex items-center justify-between mb-4">
                                     <h2 class="text-xl font-bold text-gray-900">Work Experience</h2>
@@ -275,7 +275,7 @@
                         </div>
 
                         <!-- Education Section -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden">
                             <div class="p-6">
                                 <h2 class="text-xl font-bold text-gray-900 mb-6">Education</h2>
                                 
@@ -295,7 +295,7 @@
                         </div>
 
                         <!-- Skills Section -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden">
                             <div class="p-6">
                                 <h2 class="text-xl font-bold text-gray-900 mb-4">Skills</h2>
                                 <p class="text-gray-600 text-sm mb-4">Showcase your relevant skills, both technical and soft skills to attract employer.</p>
@@ -307,7 +307,7 @@
                         </div>
 
                         <!-- Licences & Certifications Section -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden">
                             <div class="p-6">
                                 <h2 class="text-xl font-bold text-gray-900 mb-4">Licences & certifications</h2>
                                 <p class="text-gray-600 text-sm mb-4">Showcase your professional credentials. Add your relevant licences, certificates, memberships and accreditations here.</p>
@@ -319,7 +319,7 @@
                         </div>
 
                         <!-- Language Section -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden">
                             <div class="p-6">
                                 <h2 class="text-xl font-bold text-gray-900 mb-4">Language</h2>
                                 <p class="text-gray-600 text-sm mb-4">Add languages to appeal to more companies and employers.</p>

@@ -17,13 +17,13 @@
                             </div>
                             <input type="text" 
                                    placeholder="Search job titles..." 
-                                   class="pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-72 bg-gray-50 focus:bg-white transition-colors shadow-sm">
+                                   class="pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-72 bg-gray-50 focus:bg-white transition-colors shadow-xs">
                         </div>
                         
                         <!-- Enhanced Filter Dropdown -->
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open" 
-                                    class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition-all">
+                                    class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-blue-500 shadow-xs transition-all">
                                 <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z" />
                                 </svg>
@@ -72,7 +72,7 @@
                         @foreach($jobs as $job)
                             <div @click="selectedJob = {{ $job->id }}" 
                                     :class="selectedJob === {{ $job->id }} ? 'border border-blue-500 shadow-lg bg-white' : 'bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:border-blue-300 cursor-pointer'" 
-                                    class="rounded-2xl p-6 cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md group">
+                                    class="rounded-2xl p-6 cursor-pointer transition-all duration-300 shadow-xs hover:shadow-md group">
                                 
                                 <!-- Enhanced Job Header -->
                                 <div class="flex justify-between items-start mb-4">
@@ -289,7 +289,7 @@
                                 <!-- Applicants Tab -->
                                 <div x-show="activeTab === 'applicants'" class="p-6">
                                     <div class="text-center py-16">
-                                        <div class="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                                        <div class="w-20 h-20 bg-linear-to-br from-blue-100 to-indigo-200 rounded-full flex items-center justify-center mx-auto mb-6">
                                             <svg class="w-10 h-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                             </svg>
@@ -306,7 +306,7 @@
                 <!-- Enhanced Pagination -->
                 @if($jobs->hasPages())
                     <div class="mt-8 flex justify-center">
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-2">
+                        <div class="bg-white rounded-xl shadow-xs border border-gray-200 p-2">
                             {{ $jobs->links() }}
                         </div>
                     </div>

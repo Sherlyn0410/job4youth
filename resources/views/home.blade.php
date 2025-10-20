@@ -14,21 +14,21 @@
 
                 <!-- Search bar -->
                 <form class="mt-8" action="{{ route('jobs.index') }}" method="GET" role="search" aria-label="Job search">
-                    <div class="flex flex-col gap-3 rounded-xl bg-white p-2 shadow-sm ring-1 ring-gray-200 md:flex-row">
+                    <div class="flex flex-col gap-3 rounded-xl bg-white p-2 shadow-xs ring-1 ring-gray-200 md:flex-row">
                         <label class="relative flex-1">
                         <span class="sr-only">Keywords</span>
                         <input type="text" name="search" placeholder="Job title, Keyword…" 
-                            class="w-full rounded-lg border-0 pl-3 pr-3 py-3 outline-none focus:ring-2 focus:ring-blue-500" />
+                            class="w-full rounded-lg border-0 pl-3 pr-3 py-3 outline-hidden focus:ring-2 focus:ring-blue-500" />
                         </label>
 
                         <label class="relative flex-1">
                         <span class="sr-only">Location</span>
                         <input type="text" name="location" placeholder="Your Location" 
-                            class="w-full rounded-lg border-0 pl-3 pr-3 py-3 outline-none focus:ring-2 focus:ring-blue-500" />
+                            class="w-full rounded-lg border-0 pl-3 pr-3 py-3 outline-hidden focus:ring-2 focus:ring-blue-500" />
                         </label>
 
                         <button type="submit" 
-                        class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500">
                         Find Job
                         </button>
                     </div>
@@ -104,7 +104,7 @@
             </div>
         </a>
 
-        <a href="{{ route('jobs.index', ['specialization' => 'HR & Recruitment Assistant']) }}" class="group rounded-xl bg-white p-4 ring-2 ring-blue-100 shadow-sm transition hover:shadow-md">
+        <a href="{{ route('jobs.index', ['specialization' => 'HR & Recruitment Assistant']) }}" class="group rounded-xl bg-white p-4 ring-2 ring-blue-100 shadow-xs transition hover:shadow-md">
             <div>
             <p class="font-medium text-gray-900">HR &amp; Recruitment Assistant</p>
             <p class="text-sm text-gray-500">57 Open position</p>
@@ -117,7 +117,7 @@
     <!-- Upgrade skills CTA -->
     <section class="py-16 bg-gray-100">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 p-8 sm:p-10 text-white shadow">
+        <div class="rounded-2xl bg-linear-to-r from-blue-500 to-blue-600 p-8 sm:p-10 text-white shadow-sm">
         <div class="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div>
             <h3 class="text-2xl font-bold">Upgrade your skills</h3>

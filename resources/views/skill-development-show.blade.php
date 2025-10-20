@@ -2,10 +2,10 @@
     <div class="max-w-5xl mx-auto py-12 px-6">
         <a href="{{ route('skill-development') }}" class="text-blue-600 hover:underline">&larr; Back to All Courses</a>
 
-        <div class="bg-white shadow-sm rounded-lg mt-6 p-6">
+        <div class="bg-white shadow-xs rounded-lg mt-6 p-6">
             <div class="flex flex-col md:flex-row gap-6">
                 <div class="md:w-1/2">
-                    <img src="{{ asset($course->image_url) }}" alt="{{ $course->title }}" class="w-full rounded-lg shadow">
+                    <img src="{{ asset($course->image_url) }}" alt="{{ $course->title }}" class="w-full rounded-lg shadow-sm">
                 </div>
 
                 <div class="md:w-1/2 space-y-4">

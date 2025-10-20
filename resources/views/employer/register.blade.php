@@ -8,9 +8,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+<body class="bg-linear-to-br from-blue-50 to-indigo-50 min-h-screen">
     <!-- Header -->
-    <nav class="bg-white shadow-sm">
+    <nav class="bg-white shadow-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
@@ -72,7 +72,7 @@
                                 type="text" 
                                 required 
                                 value="{{ old('employer_name') }}"
-                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
+                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-xs focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
                                 placeholder="Enter your full name"
                             >
                         </div>
@@ -89,7 +89,7 @@
                                 type="text" 
                                 required 
                                 value="{{ old('company_name') }}"
-                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
+                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-xs focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
                                 placeholder="Enter your company name"
                             >
                         </div>
@@ -106,7 +106,7 @@
                                 type="email" 
                                 required 
                                 value="{{ old('email') }}"
-                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
+                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-xs focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
                                 placeholder="company@example.com"
                             >
                         </div>
@@ -122,7 +122,7 @@
                                 name="phoneNo" 
                                 type="tel" 
                                 value="{{ old('phoneNo') }}"
-                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
+                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-xs focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
                                 placeholder="+60 3-1234 5678"
                             >
                         </div>
@@ -136,7 +136,7 @@
                             <select 
                                 id="company_size" 
                                 name="company_size" 
-                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-xs focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                             >
                                 <option value="" class="text-gray-500">Select company size</option>
                                 <option value="1-10" {{ old('company_size') == '1-10' ? 'selected' : '' }}>1-10 employees</option>
@@ -156,7 +156,7 @@
                             <select 
                                 id="company_type" 
                                 name="company_type" 
-                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-xs focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                             >
                                 <option value="" class="text-gray-500">Select company type</option>
                                 <option value="startup" {{ old('company_type') == 'startup' ? 'selected' : '' }}>Startup</option>
@@ -178,7 +178,7 @@
                                 name="password" 
                                 type="password" 
                                 required 
-                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
+                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-xs focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
                                 placeholder="Enter password"
                             >
                         </div>
@@ -194,7 +194,7 @@
                                 name="password_confirmation" 
                                 type="password" 
                                 required 
-                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
+                                class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-xs focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
                                 placeholder="Confirm password"
                             >
                         </div>
@@ -210,7 +210,7 @@
                             id="company_description" 
                             name="company_description" 
                             rows="4" 
-                            class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
+                            class="block w-full px-3 py-3 border border-gray-300 rounded-lg shadow-xs focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
                             placeholder="Tell us about your company..."
                         >{{ old('company_description') }}</textarea>
                     </div>
@@ -222,7 +222,7 @@
                             name="terms" 
                             type="checkbox" 
                             required 
-                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded-sm"
                         >
                         <label for="terms" class="ml-2 block text-sm text-gray-900">
                             I agree to the <a href="#" class="text-blue-600 hover:text-blue-500 underline">Terms and Conditions</a> and <a href="#" class="text-blue-600 hover:text-blue-500 underline">Privacy Policy</a>
@@ -233,7 +233,7 @@
                     <div>
                         <button 
                             type="submit"
-                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-xs text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                         >
                             <i class="bi bi-check-circle mr-2"></i>
                             Create Employer Account

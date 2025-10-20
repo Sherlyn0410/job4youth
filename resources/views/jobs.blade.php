@@ -111,7 +111,7 @@
                                 <label class="flex items-center">
                                     <input type="radio" name="job_type" value="{{ $type }}" 
                                            {{ request('job_type') == $type ? 'checked' : '' }}
-                                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                           class="rounded-sm border-gray-300 text-blue-600 focus:ring-blue-500">
                                     <span class="ml-2 text-sm text-gray-700">{{ ucfirst($type) }}</span>
                                 </label>
                                 @endforeach
