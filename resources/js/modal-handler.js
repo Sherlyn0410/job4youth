@@ -1,23 +1,5 @@
 // Modal form handling
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Modal handler loaded');
-
-    // Check if Alpine.js is loaded
-    if (typeof Alpine === 'undefined') {
-        console.error('❌ Alpine.js is not loaded');
-    } else {
-        console.log('✅ Alpine.js is loaded');
-    }
-
-    // Debug: Log when modal events are dispatched (optional - remove in production)
-    window.addEventListener('open-modal', function(e) {
-        console.log('✅ Modal opened:', e.detail);
-    });
-
-    window.addEventListener('close-modal', function(e) {
-        console.log('✅ Modal closed:', e.detail);
-    });
-
     // Test functions for debugging (optional - remove in production)
     window.testLogin = function() {
         console.log('Testing login modal...');
