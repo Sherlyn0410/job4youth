@@ -25,8 +25,8 @@ class Job extends Model
         'job_overview',
         'responsibilities',
         'requirements',
-        'soft_skills',     
-        'hard_skills',    
+        'soft_skills',
+        'hard_skills',
         'status',
         'posted_date',
         'job_view',
@@ -35,9 +35,36 @@ class Job extends Model
     protected $casts = [
         'salary_display' => 'boolean',
         'posted_date' => 'datetime',
-        'soft_skills' => 'array',  
-        'hard_skills' => 'array',  
+        //Converts JSON strings to arrays
+        'soft_skills' => 'array',
+        'hard_skills' => 'array',
     ];
+
+    /**
+     * Scope a query to only include active jobs.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'open')
+                    ->whereNotNull('posted_date')
+                    ->where('posted_date', '<=', now());
+    }
+
+    /**
+     * Scope a query to only include pending jobs.
+     */
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    /**
+     * Scope a query to only include closed jobs.
+     */
+    public function scopeClosed($query)
+    {
+        return $query->where('status', 'closed');
+    }
 
     /**
      * Get the employer that owns the job.
@@ -53,6 +80,32 @@ class Job extends Model
     public function admin()
     {
         return $this->belongsTo(Admin::class);
+    }
+
+    /**
+     * Get the applications for this job.
+     */
+    public function applications()
+    {
+        return $this->hasMany(JobApplication::class);
+    }
+
+    /**
+     * Check if the job is active.
+     */
+    public function isActive()
+    {
+        return $this->status === 'open' && 
+               $this->posted_date && 
+               $this->posted_date <= now();
+    }
+
+    /**
+     * Increment job view count.
+     */
+    public function incrementViews()
+    {
+        $this->increment('job_view');
     }
 }
 

@@ -19,9 +19,9 @@
                                             <div class="w-20 h-20 rounded-full overflow-hidden">
                                                 <svg viewBox="0 0 100 100" class="w-full h-full">
                                                     <!-- Hair -->
-                                                    <path d="M25 35 Q50 20 75 35 Q75 25 50 25 Q25 25 25 35" fill="#8B4513"/>
+                                                    <path d="M25 35 Q50 60 75 35 Q75 25 50 25 Q25 25 25 35" fill="#8B4513"/>
                                                     <!-- Face -->
-                                                    <circle cx="50" cy="45" r="18" fill="#FDBCB4"/>
+                                                    <circle cx="50" cy="45" r="15" fill="#FDBCB4"/>
                                                     <!-- Eyes -->
                                                     <circle cx="44" cy="42" r="2" fill="#000"/>
                                                     <circle cx="56" cy="42" r="2" fill="#000"/>

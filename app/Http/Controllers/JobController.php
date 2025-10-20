@@ -20,7 +20,8 @@ class JobController extends Controller
             $query->where(function($q) use ($searchTerm) {
                 $q->where('title', 'LIKE', "%{$searchTerm}%")
                   ->orWhere('job_overview', 'LIKE', "%{$searchTerm}%")
-                  ->orWhere('skills', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('soft_skills', 'LIKE', "%{$searchTerm}%")     
+                  ->orWhere('hard_skills', 'LIKE', "%{$searchTerm}%")     
                   ->orWhere('requirements', 'LIKE', "%{$searchTerm}%")
                   ->orWhereHas('employer', function($eq) use ($searchTerm) {
                       $eq->where('company_name', 'LIKE', "%{$searchTerm}%");
@@ -149,51 +150,98 @@ class JobController extends Controller
     public function getJobDetails($id)
     {
         try {
-            // Find active job by ID with employer relationship
             $job = Job::active()->with('employer')->findOrFail($id);
-            
-            // Increment view count
             $job->incrementViews();
 
-            // Check if user has applied and saved (only if authenticated)
-            $hasApplied = auth()->check() ? auth()->user()->hasAppliedFor($id) : false;
-            $hasSaved = auth()->check() ? auth()->user()->hasSavedJob($id) : false;
-
-            // Ensure skills are properly formatted
-            $skills = $job->skills; // This will use the accessor
+            $hasApplied = false;
+            $hasSaved = false;
             
-            // Return formatted job data for modal
+            if (auth()->check()) {
+                $hasApplied = Application::where('user_id', auth()->id())
+                    ->where('job_post_id', $id)
+                    ->where('status', '!=', 'withdrawn')
+                    ->exists();
+                
+                $hasSaved = SavedJob::where('user_id', auth()->id())
+                    ->where('job_post_id', $id)
+                    ->exists();
+            }
+
+            $softSkills = $this->parseSkills($job->soft_skills);
+            $hardSkills = $this->parseSkills($job->hard_skills);
+
             return response()->json([
                 'success' => true,
                 'job' => [
                     'id' => $job->id,
                     'title' => $job->title,
-                    'company_name' => $job->employer->company_name ?? 'Company',
-                    'company_logo' => $job->employer->logo ?? null,
+                    'company_name' => $job->employer ? $job->employer->company_name : 'Unknown Company',
                     'location' => $job->location,
                     'job_type' => $job->job_type,
                     'specialization' => $job->specialization,
                     'education_level' => $job->education_level,
                     'salary_min' => $job->salary_min,
                     'salary_max' => $job->salary_max,
-                    'salary_display' => $job->salary_display ?? true,
+                    'salary_display' => $job->salary_display,
                     'job_overview' => $job->job_overview,
                     'responsibilities' => $job->responsibilities,
                     'requirements' => $job->requirements,
-                    'skills' => $skills,
+                    'soft_skills' => $softSkills,
+                    'hard_skills' => $hardSkills,
                     'posted_date' => $job->posted_date ? $job->posted_date->diffForHumans() : $job->created_at->diffForHumans(),
-                    'job_view' => $job->job_view ?? 0,
                     'has_applied' => $hasApplied,
-                    'has_saved' => $hasSaved,
-                    'application_count' => $job->applications()->count()
+                    'has_saved' => $hasSaved
                 ]
             ]);
+            
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Job not found'
-            ], 404);
+                'message' => 'Error occurred',
+                'error' => $e->getMessage()
+            ], 500);
         }
+    }
+
+    /**
+     * Helper method to parse skills that might be in different formats
+     */
+    private function parseSkills($skills)
+    {
+        if (empty($skills)) {
+            return [];
+        }
+        
+        // If it's already an array (from Laravel casting), return it
+        if (is_array($skills)) {
+            return array_values(array_filter($skills));
+        }
+        
+        // If it's a string, try to decode it
+        if (is_string($skills)) {
+            // First try to decode as JSON
+            $decoded = json_decode($skills, true);
+            
+            if (json_last_error() === JSON_ERROR_NONE) {
+                // Successfully decoded
+                if (is_array($decoded)) {
+                    return array_values(array_filter($decoded));
+                }
+                
+                // If decoded result is a string, it might be double-encoded
+                if (is_string($decoded)) {
+                    $doubleDecoded = json_decode($decoded, true);
+                    if (json_last_error() === JSON_ERROR_NONE && is_array($doubleDecoded)) {
+                        return array_values(array_filter($doubleDecoded));
+                    }
+                }
+            }
+            
+            // If JSON decode fails, treat as comma-separated string
+            return array_values(array_filter(array_map('trim', explode(',', $skills))));
+        }
+        
+        return [];
     }
 
     // Apply for job functionality
@@ -238,32 +286,44 @@ class JobController extends Controller
     public function saveJob($id)
     {
         try {
+            if (!auth()->check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please login to save jobs'
+                ], 401);
+            }
+
             $job = Job::active()->findOrFail($id);
-            $user = auth()->user();
             
             // Check if job is already saved
-            if ($user->hasSavedJob($id)) {
-                // Unsave the job
-                $user->unsaveJob($id);
+            $existingSavedJob = SavedJob::where('user_id', auth()->id())
+                ->where('job_post_id', $id)
+                ->first();
+
+            if ($existingSavedJob) {
+                // Remove from saved jobs
+                $existingSavedJob->delete();
                 return response()->json([
                     'success' => true,
                     'message' => 'Job removed from saved jobs',
-                    'action' => 'unsaved'
+                    'action' => 'removed'
                 ]);
             } else {
-                // Save the job
-                $user->saveJob($id);
+                // Add to saved jobs
+                SavedJob::create([
+                    'user_id' => auth()->id(),
+                    'job_post_id' => $id
+                ]);
                 return response()->json([
                     'success' => true,
                     'message' => 'Job saved successfully',
                     'action' => 'saved'
                 ]);
             }
-            
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error saving job: ' . $e->getMessage()
+                'message' => 'Error saving job'
             ], 500);
         }
     }
@@ -273,13 +333,16 @@ class JobController extends Controller
     {
         $user = auth()->user();
         
-        // Get all applications by the authenticated user with related job and employer data
-        // Exclude withdrawn applications
         $applications = Application::with(['job.employer'])
             ->where('user_id', $user->id)
-            ->where('status', '!=', 'withdrawn') // Exclude withdrawn applications
+            ->where('status', '!=', 'withdrawn')
             ->orderBy('apply_date', 'desc')
             ->paginate(10);
+        
+        $applications->getCollection()->transform(function ($application) {
+            $application->apply_date_human = $application->apply_date ? $application->apply_date->diffForHumans() : '';
+            return $application;
+        });
             
         return view('my-applications', compact('applications'));
     }
@@ -327,22 +390,20 @@ class JobController extends Controller
     {
         $user = auth()->user();
         
-        // Get all saved jobs by the authenticated user with related job and employer data
         $savedJobs = SavedJob::with(['job.employer'])
             ->where('user_id', $user->id)
             ->whereHas('job', function($query) {
-                $query->where('status', 'open'); // Only show active jobs
+                $query->where('status', 'open');
             })
             ->orderBy('created_at', 'desc')
             ->paginate(10);
             
-        // Add application status to each saved job
         $savedJobs->getCollection()->transform(function ($savedJob) use ($user) {
             $savedJob->job->has_applied = $user->hasAppliedFor($savedJob->job->id);
             $savedJob->created_at_human = $savedJob->created_at->diffForHumans();
             return $savedJob;
         });
-            
+        
         return view('saved-jobs', compact('savedJobs'));
     }
 }

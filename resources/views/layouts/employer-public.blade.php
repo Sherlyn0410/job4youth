@@ -15,8 +15,8 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased bg-white h-full">
-    <div cclass="min-h-screen bg-white">
+<body class="font-sans antialiased">
+    <div class="min-h-screen bg-gray-100">
         <!-- Include Employer Navigation -->
         @include('layouts.employer-navigation')
 

@@ -37,16 +37,32 @@ class JobController extends Controller
             'job_overview' => 'required|string|max:1000',
             'responsibilities' => 'required|string|max:1500',
             'requirements' => 'required|string|max:1000',
-            'soft_skills' => 'required|string',    // Updated from 'skills'
-            'hard_skills' => 'required|string',    // New field
+            'soft_skills' => 'required|string',
+            'hard_skills' => 'required|string',
         ]);
 
         // Get the authenticated employer
         $employer = Auth::guard('employer')->user();
 
-        // Parse skills from JSON
-        $softSkills = json_decode($request->soft_skills, true) ?? [];
-        $hardSkills = json_decode($request->hard_skills, true) ?? [];
+        // Handle skills properly - check if they're already JSON or arrays
+        $softSkills = [];
+        $hardSkills = [];
+        
+        // Process soft_skills
+        if (is_string($request->soft_skills)) {
+            $decoded = json_decode($request->soft_skills, true);
+            $softSkills = is_array($decoded) ? $decoded : [$request->soft_skills];
+        } elseif (is_array($request->soft_skills)) {
+            $softSkills = $request->soft_skills;
+        }
+        
+        // Process hard_skills
+        if (is_string($request->hard_skills)) {
+            $decoded = json_decode($request->hard_skills, true);
+            $hardSkills = is_array($decoded) ? $decoded : [$request->hard_skills];
+        } elseif (is_array($request->hard_skills)) {
+            $hardSkills = $request->hard_skills;
+        }
         
         // Validate skills arrays
         if (empty($softSkills) || count($softSkills) > 10) {
@@ -71,14 +87,17 @@ class JobController extends Controller
         $job->job_overview = $validatedData['job_overview'];
         $job->responsibilities = $validatedData['responsibilities'];
         $job->requirements = $validatedData['requirements'];
-        $job->soft_skills = json_encode($softSkills);      // Updated
-        $job->hard_skills = json_encode($hardSkills);      // New
+        
+        // Store as proper JSON arrays (Laravel will auto-encode with array cast)
+        $job->soft_skills = $softSkills;  // Let Laravel handle the encoding
+        $job->hard_skills = $hardSkills;  // Let Laravel handle the encoding
+        
         $job->status = 'pending';
         $job->posted_date = now();
         
         $job->save();
 
-        return redirect()->route('employer.jobs.index')->with('success', 'Job posted successfully!');
+        return redirect()->route('employer.jobs.manage')->with('success', 'Job posted successfully!');
     }
 
     public function show($id)

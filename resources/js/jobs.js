@@ -4,8 +4,8 @@ class JobsPage {
         this.currentApplicationId = null;
         this.currentSavedJobId = null;
         this.pageType = 'jobs'; // 'jobs', 'applications', or 'saved-jobs'
-        this.applications = []; // Store applications data for application pages
-        this.savedJobs = []; // Store saved jobs data for saved jobs pages
+        this.applications = []; 
+        this.savedJobs = []; 
         this.init();
     }
 
@@ -117,7 +117,11 @@ class JobsPage {
         this.updateTextSection('details-requirements-section', 'details-requirements', job.requirements);
         
         // Update skills
-        this.updateSkillsSection(job.skills);
+        this.updateSkillsSection(job.soft_skills, job.hard_skills);
+        
+        // Update additional details
+        this.updateOptionalRow('details-specialization-row', 'details-specialization', job.specialization);
+        this.updateOptionalRow('details-education-row', 'details-education', job.education_level);
         
         // Update action buttons for saved jobs
         this.updateSavedJobActionButtons(savedJob);
@@ -213,18 +217,16 @@ class JobsPage {
         
         this.currentJobId = jobId;
         
-        // Update active job card styling with #006EDC color
+        // Update active job card styling
         document.querySelectorAll('[data-job-id]').forEach(card => {
             card.classList.remove('border-blue-500', 'shadow-lg');
             card.classList.add('border-gray-200');
-            card.style.borderColor = '';
         });
         
         const activeCard = document.querySelector(`[data-job-id="${jobId}"]`);
         if (activeCard) {
             activeCard.classList.add('border-blue-500', 'shadow-lg');
             activeCard.classList.remove('border-gray-200');
-            activeCard.style.borderColor = '#006EDC';
         }
         
         // Show loading state
@@ -235,23 +237,91 @@ class JobsPage {
         if (contentElement) contentElement.style.display = 'none';
         
         // Fetch job details
-        fetch(`/jobs/${jobId}/details`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    this.populateJobDetails(data.job);
-                    if (loadingElement) loadingElement.style.display = 'none';
-                    if (contentElement) contentElement.style.display = 'flex';
-                }
-            })
-            .catch(error => {
-                console.error('Error loading job details:', error);
-                if (loadingElement) {
-                    loadingElement.innerHTML = 
-                        '<div class="text-center"><p class="text-red-500">Error loading job details</p></div>';
-                }
-            });
-    }
+        fetch(`/jobs/${jobId}/details`, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('Response is not JSON');
+            }
+            
+            return response.json();
+        })
+        .then(data => {
+            if (data.success && data.job) {
+                const job = data.job;
+                
+                // Hide loading and show content
+                if (loadingElement) loadingElement.style.display = 'none';
+                if (contentElement) contentElement.style.display = 'flex';
+                
+                // Update basic job information
+                this.updateElement('details-company-logo', job.company_name.charAt(0));
+                this.updateElement('details-job-title', job.title);
+                this.updateElement('details-company-name', job.company_name);
+                this.updateElement('details-location', `<i class="bi bi-geo-alt text-gray-500"></i> ${job.location || 'Not specified'}`, true);
+                this.updateElement('details-job-type', job.job_type || 'Not specified');
+                
+                // Update salary
+                const salaryText = job.salary_display && job.salary_min && job.salary_max ? 
+                    `RM ${job.salary_min.toLocaleString()} - ${job.salary_max.toLocaleString()}` : 'Undisclosed';
+                this.updateElement('details-salary', salaryText);
+                
+                // Update job overview
+                this.updateElement('details-job-overview', job.job_overview || 'No description available.', true);
+                
+                // Update posted date
+                this.updateElement('details-posted-date', job.posted_date);
+                this.updateElement('details-job-id', `#${job.id}`);
+                
+                // Update sections with proper formatting
+                this.updateListSection('details-responsibilities-section', 'details-responsibilities', job.responsibilities);
+                this.updateListSection('details-requirements-section', 'details-requirements', job.requirements);
+                
+                // Update skills section
+                this.updateSkillsSection(job.soft_skills, job.hard_skills);
+                
+                // Update additional details
+                this.updateOptionalRow('details-specialization-row', 'details-specialization', job.specialization);
+                this.updateOptionalRow('details-education-row', 'details-education', job.education_level);
+                
+                // Update action buttons
+                this.updateActionButtons(job);
+            } else {
+                throw new Error(data.message || 'Invalid response format');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading job details:', error);
+            
+            // Hide loading and show error
+            if (loadingElement) loadingElement.style.display = 'none';
+            if (contentElement) {
+                contentElement.style.display = 'flex';
+                contentElement.innerHTML = `
+                    <div class="flex justify-center items-center h-full p-6">
+                        <div class="text-center">
+                            <i class="bi bi-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                            <p class="text-red-600 font-medium">Error loading job details</p>
+                            <p class="text-gray-500 text-sm mt-2">${error.message}</p>
+                            <button onclick="window.jobsPageInstance.loadJobDetails(${jobId})" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                Try Again
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+}
 
     loadApplicationDetails(applicationId) {
         if (this.currentApplicationId === applicationId) return;
@@ -285,45 +355,6 @@ class JobsPage {
         
         // Populate details
         this.populateApplicationDetails(application);
-    }
-
-    populateJobDetails(job) {  
-        // Update basic job information
-        this.updateElement('details-company-logo', job.company_name.charAt(0));
-        this.updateElement('details-job-title', job.title);
-        this.updateElement('details-company-name', job.company_name);
-        this.updateElement('details-location', `<i class="bi bi-geo-alt text-gray-500"></i> ${job.location || 'Not specified'}`, true);
-        this.updateElement('details-job-type', job.job_type || 'Not specified');
-        
-        // Update salary
-        const salaryText = job.salary_display && job.salary_min && job.salary_max ? 
-            `RM ${job.salary_min.toLocaleString()} - ${job.salary_max.toLocaleString()}` : 'Undisclosed';
-        this.updateElement('details-salary', salaryText);
-        
-        // Update job overview
-        this.updateElement('details-job-overview', job.job_overview || 'No description available.', true);
-        
-        // Update posted date
-        this.updateElement('details-posted-date', job.posted_date);
-        this.updateElement('details-job-id', `#${job.id}`);
-        
-        // Update company logo duplicates
-        this.updateElement('company-logo-large', job.company_name.charAt(0));
-        this.updateElement('company-name-large', job.company_name);
-        
-        // Update sections with proper formatting
-        this.updateListSection('details-responsibilities-section', 'details-responsibilities', job.responsibilities);
-        this.updateListSection('details-requirements-section', 'details-requirements', job.requirements);
-        
-        // Update skills section
-        this.updateSkillsSection(job.skills);
-        
-        // Update additional details
-        this.updateOptionalRow('details-specialization-row', 'details-specialization', job.specialization);
-        this.updateOptionalRow('details-education-row', 'details-education', job.education_level);
-        
-        // Update action buttons
-        this.updateActionButtons(job);
     }
 
     populateApplicationDetails(application) {
@@ -381,7 +412,7 @@ class JobsPage {
         this.updateTextSection('details-requirements-section', 'details-requirements', application.job.requirements);
         
         // Update skills
-        this.updateSkillsSection(application.job.skills);
+        this.updateSkillsSection(application.job.soft_skills, application.job.hard_skills);
         
         // Update action buttons for applications
         this.updateApplicationActionButtons(application);
@@ -424,7 +455,7 @@ class JobsPage {
         }
     }
 
-    updateSkillsSection(skills) {
+    updateSkillsSection(softSkills, hardSkills) {
         const section = document.getElementById('details-skills-section');
         const container = document.getElementById('details-skills');
         
@@ -432,34 +463,80 @@ class JobsPage {
             return;
         }
         
-        let skillsArray = [];
-        
-        // Handle different skill formats
-        if (skills) {
-            if (Array.isArray(skills)) {
-                skillsArray = skills.filter(skill => skill && skill.trim());
-            } else if (typeof skills === 'string' && skills.trim()) {
-                skillsArray = [skills.trim()];
+        // Process soft skills
+        let softSkillsArray = [];
+        if (softSkills) {
+            if (Array.isArray(softSkills)) {
+                softSkillsArray = softSkills.filter(skill => skill && skill.trim());
+            } else if (typeof softSkills === 'string' && softSkills.trim()) {
+                try {
+                    const parsed = JSON.parse(softSkills);
+                    softSkillsArray = Array.isArray(parsed) ? parsed.filter(skill => skill && skill.trim()) : [softSkills.trim()];
+                } catch (e) {
+                    softSkillsArray = [softSkills.trim()];
+                }
             }
         }
         
-        // Always show the section
-        section.style.display = 'block';
-        
-        if (skillsArray && skillsArray.length > 0) {
-            // Create skill badges
-            container.innerHTML = '';
-            skillsArray.forEach(skill => {
-                if (skill && skill.trim()) {
-                    const skillBadge = document.createElement('span');
-                    skillBadge.className = 'px-3 py-2 rounded-full text-sm font-medium';
-                    skillBadge.style.backgroundColor = 'rgba(255, 165, 0, 0.15)';
-                    skillBadge.style.color = '#FF8C00';
-                    skillBadge.textContent = skill.trim();
-                    container.appendChild(skillBadge);
+        // Process hard skills
+        let hardSkillsArray = [];
+        if (hardSkills) {
+            if (Array.isArray(hardSkills)) {
+                hardSkillsArray = hardSkills.filter(skill => skill && skill.trim());
+            } else if (typeof hardSkills === 'string' && hardSkills.trim()) {
+                try {
+                    const parsed = JSON.parse(hardSkills);
+                    hardSkillsArray = Array.isArray(parsed) ? parsed.filter(skill => skill && skill.trim()) : [hardSkills.trim()];
+                } catch (e) {
+                    hardSkillsArray = [hardSkills.trim()];
                 }
-            });
+            }
+        }
+        
+        // Show/hide section based on whether we have any skills
+        if (softSkillsArray.length > 0 || hardSkillsArray.length > 0) {
+            section.style.display = 'block';
+            container.innerHTML = '';
+            
+            // Add soft skills section
+            if (softSkillsArray.length > 0) {
+                const softSkillsHeader = document.createElement('div');
+                softSkillsHeader.innerHTML = '<h4 class="text-lg font-semibold text-gray-900 mb-3 flex items-center">Soft Skills</h4>';
+                container.appendChild(softSkillsHeader);
+                
+                const softSkillsDiv = document.createElement('div');
+                softSkillsDiv.className = 'flex flex-wrap gap-2 mb-6';
+                softSkillsArray.forEach(skill => {
+                    if (skill && skill.trim()) {
+                        const skillBadge = document.createElement('span');
+                        skillBadge.className = 'inline-flex items-center px-3 py-2 rounded-full text-sm font-medium bg-orange-50 text-orange-700 border border-orange-200';
+                        skillBadge.textContent = skill.trim();
+                        softSkillsDiv.appendChild(skillBadge);
+                    }
+                });
+                container.appendChild(softSkillsDiv);
+            }
+            
+            // Add hard skills section
+            if (hardSkillsArray.length > 0) {
+                const hardSkillsHeader = document.createElement('div');
+                hardSkillsHeader.innerHTML = '<h4 class="text-lg font-semibold text-gray-900 mb-3 flex items-center"><span class="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>Hard Skills</h4>';
+                container.appendChild(hardSkillsHeader);
+                
+                const hardSkillsDiv = document.createElement('div');
+                hardSkillsDiv.className = 'flex flex-wrap gap-2';
+                hardSkillsArray.forEach(skill => {
+                    if (skill && skill.trim()) {
+                        const skillBadge = document.createElement('span');
+                        skillBadge.className = 'inline-flex items-center px-3 py-2 rounded-full text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200';
+                        skillBadge.textContent = skill.trim();
+                        hardSkillsDiv.appendChild(skillBadge);
+                    }
+                });
+                container.appendChild(hardSkillsDiv);
+            }
         } else {
+            section.style.display = 'block';
             container.innerHTML = '<span class="text-gray-500 italic">No specific skills listed</span>';
         }
     }
@@ -485,66 +562,83 @@ class JobsPage {
         
         // Apply Button
         if (applyBtn) {
+            // Clear existing hover events first
+            applyBtn.onmouseover = null;
+            applyBtn.onmouseout = null;
+            
             if (isAuthenticated) {
                 if (job.has_applied) {
                     applyBtn.innerHTML = '<i class="bi bi-check-circle mr-2"></i>Applied';
-                    applyBtn.style.backgroundColor = '#006EDC';
+                    applyBtn.style.backgroundColor = '#6B7280';
+                    applyBtn.style.color = '#FFFFFF';
                     applyBtn.disabled = true;
                 } else {
                     applyBtn.innerHTML = '<i class="bi bi-send mr-2"></i>Apply Now';
                     applyBtn.style.backgroundColor = '#006EDC';
+                    applyBtn.style.color = '#FFFFFF';
                     applyBtn.disabled = false;
+                    // Add hover effects only for active buttons
+                    applyBtn.onmouseover = function() { this.style.backgroundColor = '#005BB5'; };
+                    applyBtn.onmouseout = function() { this.style.backgroundColor = '#006EDC'; };
                 }
             } else {
                 applyBtn.innerHTML = '<i class="bi bi-send mr-2"></i>Login to Apply';
                 applyBtn.style.backgroundColor = '#006EDC';
+                applyBtn.style.color = '#FFFFFF';
                 applyBtn.disabled = false;
+                applyBtn.onmouseover = function() { this.style.backgroundColor = '#005BB5'; };
+                applyBtn.onmouseout = function() { this.style.backgroundColor = '#006EDC'; };
             }
-            applyBtn.onmouseover = function() { this.style.backgroundColor = '#005BB5'; };
-            applyBtn.onmouseout = function() { this.style.backgroundColor = '#006EDC'; };
         }
 
         // Save Button
         if (saveBtn) {
+            // Clear all existing styles and events
+            saveBtn.className = 'flex-1 px-6 py-3 font-medium rounded-lg transition-colors flex items-center justify-center gap-2';
+            saveBtn.style.backgroundColor = '';
+            saveBtn.style.color = '';
+            saveBtn.onmouseover = null;
+            saveBtn.onmouseout = null;
+            
             if (isAuthenticated) {
                 if (job.has_saved) {
                     saveBtn.innerHTML = '<i class="bi bi-heart-fill mr-2"></i>Saved';
                     saveBtn.style.backgroundColor = '#FEE2E2';
                     saveBtn.style.color = '#991B1B';
+                    saveBtn.style.borderColor = '#FECACA';
+                    saveBtn.style.border = '1px solid #FECACA';
+                    // Add hover effect for saved state
                     saveBtn.onmouseover = function() { 
-                        this.style.backgroundColor = '#fdc9c9';
+                        this.style.backgroundColor = '#FDC2C4';
                     };
                     saveBtn.onmouseout = function() { 
                         this.style.backgroundColor = '#FEE2E2';
                     };
                 } else {
                     saveBtn.innerHTML = '<i class="bi bi-heart mr-2"></i>Save Job';
-                    saveBtn.classList.remove('bg-red-100', 'text-red-700');
-                    saveBtn.classList.add('bg-gray-100', 'text-gray-700');
-                    saveBtn.style.backgroundColor = '';
-                    saveBtn.style.color = '';
+                    saveBtn.style.backgroundColor = '#F3F4F6';
+                    saveBtn.style.color = '#374151';
+                    saveBtn.style.borderColor = '#D1D5DB';
+                    saveBtn.style.border = '1px solid #D1D5DB';
+                    // Add hover effect for unsaved state
                     saveBtn.onmouseover = function() { 
-                        this.classList.remove('bg-gray-100');
-                        this.classList.add('bg-gray-200');
+                        this.style.backgroundColor = '#E5E7EB';
                     };
                     saveBtn.onmouseout = function() { 
-                        this.classList.remove('bg-gray-200');
-                        this.classList.add('bg-gray-100');
+                        this.style.backgroundColor = '#F3F4F6';
                     };
                 }
             } else {
                 saveBtn.innerHTML = '<i class="bi bi-heart mr-2"></i>Login to Save';
-                saveBtn.classList.remove('bg-red-100', 'text-red-700');
-                saveBtn.classList.add('bg-gray-100', 'text-gray-700');
-                saveBtn.style.backgroundColor = '';
-                saveBtn.style.color = '';
+                saveBtn.style.backgroundColor = '#F3F4F6';
+                saveBtn.style.color = '#374151';
+                saveBtn.style.borderColor = '#D1D5DB';
+                saveBtn.style.border = '1px solid #D1D5DB';
                 saveBtn.onmouseover = function() { 
-                    this.classList.remove('bg-gray-100');
-                    this.classList.add('bg-gray-200');
+                    this.style.backgroundColor = '#E5E7EB';
                 };
                 saveBtn.onmouseout = function() { 
-                    this.classList.remove('bg-gray-200');
-                    this.classList.add('bg-gray-100');
+                    this.style.backgroundColor = '#F3F4F6';
                 };
             }
         }
@@ -621,7 +715,8 @@ class JobsPage {
             .then(data => {
                 if (data.success) {
                     alert(data.message);
-                    this.loadJobDetails(this.currentJobId); // Refresh job details
+                    // Refresh job details to show updated button state
+                    this.loadJobDetails(this.currentJobId);
                 } else {
                     alert(data.message);
                 }
@@ -654,8 +749,8 @@ class JobsPage {
             .then(data => {
                 if (data.success) {
                     alert(data.message);
-                    // Refresh page to see latest changes
-                    window.location.reload();
+                    // Instead of reloading the entire page, refresh just the job details
+                    this.loadJobDetails(this.currentJobId);
                 } else {
                     alert(data.message);
                 }

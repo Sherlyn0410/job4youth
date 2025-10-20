@@ -132,4 +132,14 @@
         </div>
     </div>
     </section>
+
+    <!-- Auto-open login modal if redirected from /login -->
+    @if(session('show_login_modal'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Trigger login modal to open
+            window.dispatchEvent(new CustomEvent('open-modal', { detail: 'login' }));
+        });
+    </script>
+    @endif
 </x-public-layout>

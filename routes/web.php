@@ -46,7 +46,15 @@ Route::get('/career-guidance', function () {
 })->name('career-guidance');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    // Profile routes
+    Route::get('/profile', function () {
+        return view('profile');
+    })->name('profile.edit');
+    
+    // Profile picture update route
+    Route::patch('/profile/picture', [ProfileController::class, 'updateProfilePicture'])->name('profile.picture.update');
+    
+    // Keep only essential profile routes
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
