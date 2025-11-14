@@ -173,7 +173,7 @@ class JobsPage {
             .then(data => {
                 if (data.success) {
                     alert(data.message);
-                    // Refresh page to see latest changes
+                    // Refresh page to update latest changes
                     window.location.reload();
                 } else {
                     alert(data.message);
@@ -200,7 +200,7 @@ class JobsPage {
         .then(data => {
             if (data.success) {
                 alert(data.message);
-                // Refresh page to see latest changes
+                // Refresh page to update latest changes
                 window.location.reload();
             } else {
                 alert(data.message);
@@ -500,40 +500,56 @@ class JobsPage {
             
             // Add soft skills section
             if (softSkillsArray.length > 0) {
-                const softSkillsHeader = document.createElement('div');
-                softSkillsHeader.innerHTML = '<h4 class="text-lg font-semibold text-gray-900 mb-3 flex items-center">Soft Skills</h4>';
-                container.appendChild(softSkillsHeader);
+                const softSkillsRow = document.createElement('div');
+                softSkillsRow.className = 'flex items-start gap-4 mb-6';
                 
+                // Title on the left
+                const softSkillsTitle = document.createElement('div');
+                softSkillsTitle.className = 'shrink-0 w-32';
+                softSkillsTitle.innerHTML = '<h4 class="text-lg font-semibold text-gray-900">Soft Skills</h4>';
+                
+                // Skills on the right
                 const softSkillsDiv = document.createElement('div');
-                softSkillsDiv.className = 'flex flex-wrap gap-2 mb-6';
+                softSkillsDiv.className = 'flex flex-wrap gap-2 flex-1';
                 softSkillsArray.forEach(skill => {
                     if (skill && skill.trim()) {
                         const skillBadge = document.createElement('span');
-                        skillBadge.className = 'inline-flex items-center px-3 py-2 rounded-full text-sm font-medium bg-orange-50 text-orange-700 border border-orange-200';
+                        skillBadge.className = 'inline-flex items-center px-3 py-2 rounded-full text-sm font-medium bg-orange-50 text-orange-600 border border-orange-200';
                         skillBadge.textContent = skill.trim();
                         softSkillsDiv.appendChild(skillBadge);
                     }
                 });
-                container.appendChild(softSkillsDiv);
+                
+                softSkillsRow.appendChild(softSkillsTitle);
+                softSkillsRow.appendChild(softSkillsDiv);
+                container.appendChild(softSkillsRow);
             }
             
             // Add hard skills section
             if (hardSkillsArray.length > 0) {
-                const hardSkillsHeader = document.createElement('div');
-                hardSkillsHeader.innerHTML = '<h4 class="text-lg font-semibold text-gray-900 mb-3 flex items-center"><span class="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>Hard Skills</h4>';
-                container.appendChild(hardSkillsHeader);
+                const hardSkillsRow = document.createElement('div');
+                hardSkillsRow.className = 'flex items-start gap-4';
                 
+                // Title on the left
+                const hardSkillsTitle = document.createElement('div');
+                hardSkillsTitle.className = 'shrink-0 w-32';
+                hardSkillsTitle.innerHTML = '<h4 class="text-lg font-semibold text-gray-900 flex items-center">Hard Skills</h4>';
+                
+                // Skills on the right
                 const hardSkillsDiv = document.createElement('div');
-                hardSkillsDiv.className = 'flex flex-wrap gap-2';
+                hardSkillsDiv.className = 'flex flex-wrap gap-2 flex-1';
                 hardSkillsArray.forEach(skill => {
                     if (skill && skill.trim()) {
                         const skillBadge = document.createElement('span');
-                        skillBadge.className = 'inline-flex items-center px-3 py-2 rounded-full text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200';
+                        skillBadge.className = 'inline-flex items-center px-3 py-2 rounded-full text-sm font-medium bg-orange-50 text-orange-600 border border-orange-200';
                         skillBadge.textContent = skill.trim();
                         hardSkillsDiv.appendChild(skillBadge);
                     }
                 });
-                container.appendChild(hardSkillsDiv);
+                
+                hardSkillsRow.appendChild(hardSkillsTitle);
+                hardSkillsRow.appendChild(hardSkillsDiv);
+                container.appendChild(hardSkillsRow);
             }
         } else {
             section.style.display = 'block';
@@ -670,6 +686,7 @@ class JobsPage {
             .then(data => {
                 if (data.success) {
                     alert(data.message);
+                    // Refresh page to update latest changes
                     window.location.reload();
                 } else {
                     alert(data.message);
@@ -715,8 +732,8 @@ class JobsPage {
             .then(data => {
                 if (data.success) {
                     alert(data.message);
-                    // Refresh job details to show updated button state
-                    this.loadJobDetails(this.currentJobId);
+                    // Refresh page to update button states
+                    window.location.reload();
                 } else {
                     alert(data.message);
                 }
@@ -749,8 +766,8 @@ class JobsPage {
             .then(data => {
                 if (data.success) {
                     alert(data.message);
-                    // Instead of reloading the entire page, refresh just the job details
-                    this.loadJobDetails(this.currentJobId);
+                    // Refresh page to update button states
+                    window.location.reload();
                 } else {
                     alert(data.message);
                 }

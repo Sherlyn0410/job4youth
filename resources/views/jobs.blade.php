@@ -70,7 +70,7 @@
         >
             <!-- Backdrop -->
             <div 
-                class="absolute inset-0 bg-black bg-opacity-50"
+                class="absolute inset-0 bg-black/50"
                 @click="showFilters = false"
             ></div>
 
