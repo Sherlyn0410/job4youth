@@ -13,6 +13,17 @@ class JobController extends Controller
     {
         $employer = Auth::guard('employer')->user();
         
+        // Debug: Always log request parameters
+        \Log::info('Job manage page accessed', [
+            'employer_id' => $employer->id,
+            'request_method' => $request->method(),
+            'all_parameters' => $request->all(),
+            'search_param' => $request->get('search'),
+            'status_param' => $request->get('status'),
+            'has_search' => $request->has('search'),
+            'filled_search' => $request->filled('search')
+        ]);
+        
         // Get jobs for this employer 
         $query = Job::where('employer_id', $employer->id);
         
@@ -21,18 +32,36 @@ class JobController extends Controller
         
         // Apply search filter
         $searchTerm = null;
-        if ($request->filled('search')) {
-            $searchTerm = trim($request->get('search'));
-            if (!empty($searchTerm)) {
-                $query->where(function($q) use ($searchTerm) {
-                    $q->where('title', 'LIKE', '%' . $searchTerm . '%')
-                      ->orWhere('job_overview', 'LIKE', '%' . $searchTerm . '%')
-                      ->orWhere('specialization', 'LIKE', '%' . $searchTerm . '%')
-                      ->orWhere('location', 'LIKE', '%' . $searchTerm . '%')
-                      ->orWhere('responsibilities', 'LIKE', '%' . $searchTerm . '%')
-                      ->orWhere('requirements', 'LIKE', '%' . $searchTerm . '%');
-                });
-            }
+        $rawSearch = $request->get('search');
+        if ($rawSearch !== null) {
+            $searchTerm = trim($rawSearch);
+        }
+        
+        if (!empty($searchTerm)) {
+            // Log search activity for debugging
+            \Log::info('Job search performed', [
+                'employer_id' => $employer->id,
+                'search_term' => $searchTerm,
+                'total_jobs_before_search' => $totalJobsCount,
+                'request_data' => $request->all()
+            ]);
+            
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'LIKE', '%' . $searchTerm . '%')
+                  ->orWhere('job_overview', 'LIKE', '%' . $searchTerm . '%')
+                  ->orWhere('specialization', 'LIKE', '%' . $searchTerm . '%')
+                  ->orWhere('location', 'LIKE', '%' . $searchTerm . '%')
+                  ->orWhere('responsibilities', 'LIKE', '%' . $searchTerm . '%')
+                  ->orWhere('requirements', 'LIKE', '%' . $searchTerm . '%');
+            });
+            
+            // Debug: Log the SQL query
+            $sql = $query->toSql();
+            $bindings = $query->getBindings();
+            \Log::info('Search SQL Query', [
+                'sql' => $sql,
+                'bindings' => $bindings
+            ]);
         }
         
         // Apply status filter
@@ -58,6 +87,15 @@ class JobController extends Controller
             'pending' => Job::where('employer_id', $employer->id)->where('status', 'pending')->count(),
             'closed' => Job::where('employer_id', $employer->id)->where('status', 'closed')->count(),
         ];
+        
+        // Log final results for debugging
+        if ($searchTerm) {
+            \Log::info('Search results', [
+                'search_term' => $searchTerm,
+                'results_found' => $jobs->total(),
+                'current_page' => $jobs->currentPage()
+            ]);
+        }
         
         return view('employer.jobs.manage', compact('jobs', 'statusCounts'));
     }
@@ -244,34 +282,5 @@ class JobController extends Controller
         return redirect()->route('employer.jobs.manage')->with('success', 'Job deleted successfully!');
     }
 
-    // Temporary debug method - remove after testing
-    public function debugSearch(Request $request)
-    {
-        $employer = Auth::guard('employer')->user();
-        
-        $totalJobs = Job::where('employer_id', $employer->id)->count();
-        $searchTerm = $request->get('search', '');
-        
-        $query = Job::where('employer_id', $employer->id);
-        
-        if (!empty($searchTerm)) {
-            $query->where(function($q) use ($searchTerm) {
-                $q->where('title', 'LIKE', '%' . $searchTerm . '%')
-                  ->orWhere('job_overview', 'LIKE', '%' . $searchTerm . '%')
-                  ->orWhere('specialization', 'LIKE', '%' . $searchTerm . '%')
-                  ->orWhere('location', 'LIKE', '%' . $searchTerm . '%');
-            });
-        }
-        
-        $filteredJobs = $query->count();
-        $jobs = $query->get(['id', 'title', 'location', 'specialization']);
-        
-        return response()->json([
-            'employer_id' => $employer->id,
-            'search_term' => $searchTerm,
-            'total_jobs' => $totalJobs,
-            'filtered_jobs' => $filteredJobs,
-            'jobs' => $jobs
-        ]);
-    }
+
 }

@@ -66,6 +66,6 @@ class Employer extends Authenticatable
     // Relationship with jobs (if you have a jobs table)
     public function jobs()
     {
-        return $this->hasMany(\App\Models\Job::class, 'employer_id');
+        return $this->hasMany(Job::class, 'employer_id');
     }
 }

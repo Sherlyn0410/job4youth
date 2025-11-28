@@ -12,15 +12,9 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex sm:items-center">
-                    <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
-                        {{ __('Home') }}
+                    <x-nav-link :href="route('match-job')" :active="request()->routeIs('match-job')">
+                        {{ __('Match Job') }}
                     </x-nav-link>
-
-                    @auth
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                    @endauth
 
                     <!-- Updated Jobs Navigation Link -->
                     <x-nav-link :href="route('jobs.index')" :active="request()->routeIs('jobs.*') || request()->is('jobs*')">
@@ -73,6 +67,15 @@
                             <x-dropdown-link :href="route('skill-development')">
                                 {{ __('Skill Development Hub') }}
                             </x-dropdown-link>
+                            @auth
+                            <x-dropdown-link :href="route('learning-activity')">
+                                {{ __('Learning Activity') }}
+                            </x-dropdown-link>
+                            @else
+                            <button @click="$dispatch('open-modal', 'login')" class="block w-full text-left px-4 py-2 text-md text-gray-700 hover:bg-gray-100 rounded-md">
+                                {{ __('Learning Activity (Login Required)') }}
+                            </button>
+                            @endauth
                             <x-dropdown-link :href="route('career-guidance')">
                                 {{ __('Career Guidance Tools') }}
                             </x-dropdown-link>
@@ -157,15 +160,9 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
-                {{ __('Home') }}
+            <x-responsive-nav-link :href="route('match-job')" :active="request()->routeIs('match-job')">
+                {{ __('Match Job') }}
             </x-responsive-nav-link>
-
-            @auth
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-            @endauth
 
             <!-- Updated Mobile Jobs Navigation Link -->
             <x-responsive-nav-link :href="route('jobs.index')" :active="request()->routeIs('jobs.*') || request()->is('jobs*')">
@@ -195,6 +192,15 @@
                 <x-responsive-nav-link :href="route('skill-development')" class="pl-8">
                     {{ __('Skill Development Hub') }}
                 </x-responsive-nav-link>
+                @auth
+                <x-responsive-nav-link :href="route('learning-activity')" class="pl-8">
+                    {{ __('Learning Activity') }}
+                </x-responsive-nav-link>
+                @else
+                <button @click="$dispatch('open-modal', 'login')" class="block w-full text-left pl-8 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 focus:outline-hidden focus:text-gray-800 focus:bg-gray-50 focus:border-gray-300 transition duration-150 ease-in-out">
+                    {{ __('Learning Activity (Login Required)') }}
+                </button>
+                @endauth
                 <x-responsive-nav-link :href="route('career-guidance')" class="pl-8">
                     {{ __('Career Guidance Tools') }}
                 </x-responsive-nav-link>

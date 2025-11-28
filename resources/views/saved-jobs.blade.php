@@ -4,7 +4,7 @@
             <!-- Page Header -->
             <div class="mb-6">
                 <h2 class="text-xl font-bold text-gray-900">Saved Jobs</h2>
-                <p class="text-gray-600 mt-2">Keep track of interesting job opportunities you want to apply to later</p>
+                <p class="text-gray-600 mt-2">{{ $savedJobs->total() }} {{ Str::plural('job', $savedJobs->total()) }} saved</p>
             </div>
 
             @if($savedJobs->count() > 0)

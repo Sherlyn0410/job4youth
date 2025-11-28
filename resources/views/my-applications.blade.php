@@ -3,8 +3,8 @@
         <div class="max-w-7xl mx-auto px-4">
             <!-- Page Header -->
             <div class="mb-6">
-                <h2 class="text-xl font-semibold text-gray-900">My Applications</h1>
-                <p class="text-gray-600 mt-2">Track the status of your job applications</p>
+                <h2 class="text-xl font-semibold text-gray-900">My Applications</h2>
+                <p class="text-gray-600 mt-2">{{ $applications->total() }} {{ Str::plural('application', $applications->total()) }} submitted</p>
             </div>
 
             @if($applications->count() > 0)

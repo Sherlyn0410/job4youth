@@ -12,6 +12,10 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
+Route::get('/match-job', function () {
+    return view('match-job');
+})->name('match-job');
+
 Route::get('/jobs', [JobController::class, 'index'])->name('jobs.index');
 Route::get('/jobs/{id}/details', [JobController::class, 'getJobDetails'])->name('jobs.details');
 Route::post('/jobs/{id}/apply', [JobController::class, 'applyForJob'])->name('jobs.apply');
@@ -62,6 +66,7 @@ Route::middleware('auth')->group(function () {
 // Skill Development Route
 Route::get('/skill-development', [CourseController::class, 'index'])->name('skill-development');
 Route::get('/skill-development/search', [CourseController::class, 'search'])->name('skill-development.search');
+Route::get('/learning-activity', [CourseController::class, 'learningActivity'])->name('learning-activity');
 
 Route::get('/skill-development/{slug}', [CourseController::class, 'show'])->name('skill-development.show');
 
@@ -96,6 +101,7 @@ Route::prefix('employer')->name('employer.')->group(function () {
         // Jobs routes
         Route::prefix('jobs')->name('jobs.')->group(function () {
             Route::get('/', [App\Http\Controllers\Employer\JobController::class, 'manage'])->name('manage');
+            Route::get('/debug-search', [App\Http\Controllers\Employer\JobController::class, 'debugSearch'])->name('debug');
             Route::get('/create', [App\Http\Controllers\Employer\JobController::class, 'create'])->name('create');
             Route::post('/', [App\Http\Controllers\Employer\JobController::class, 'store'])->name('store');
             Route::get('/{job}', [App\Http\Controllers\Employer\JobController::class, 'show'])->name('show');

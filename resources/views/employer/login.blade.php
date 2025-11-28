@@ -26,10 +26,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
-                    <div class="flex items-center">
+                    <a href="{{ route('home') }}" class="flex items-center">
                         <x-application-logo class="block h-5 w-auto" />
                         <span class="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Employer</span>
-                    </div>
+                    </a>
                 </div>
                 <div class="flex items-center space-x-4">
                     <a href="{{ route('home') }}" class="text-gray-600 hover:text-gray-900 flex items-center gap-2">

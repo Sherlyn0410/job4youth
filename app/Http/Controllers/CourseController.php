@@ -83,4 +83,40 @@ class CourseController extends Controller
         $courses = $user ? $user->courses()->latest('pivot_purchased_at')->get() : collect();
         return view('learning-activities', compact('courses'));
     }
+
+    // Show user's enrolled courses with progress
+    public function learningActivity()
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        $user = auth()->user();
+        
+        // Get enrolled courses with progress data
+        $enrolledCourses = $user->courses()
+            ->orderBy('course_user.created_at', 'desc')
+            ->get();
+
+        // Calculate overall statistics
+        $totalCourses = $enrolledCourses->count();
+        $completedCourses = $enrolledCourses->where('pivot.is_completed', true)->count();
+        $inProgressCourses = $enrolledCourses->where('pivot.is_completed', false)
+            ->where('pivot.progress_percentage', '>', 0)->count();
+        $notStartedCourses = $enrolledCourses->where('pivot.progress_percentage', 0)->count();
+        
+        $totalHoursCompleted = $enrolledCourses->sum('pivot.completed_hours');
+        $averageProgress = $totalCourses > 0 ? 
+            $enrolledCourses->avg('pivot.progress_percentage') : 0;
+
+        return view('learning-activity', compact(
+            'enrolledCourses', 
+            'totalCourses', 
+            'completedCourses', 
+            'inProgressCourses', 
+            'notStartedCourses',
+            'totalHoursCompleted',
+            'averageProgress'
+        ));
+    }
 }

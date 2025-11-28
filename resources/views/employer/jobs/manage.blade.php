@@ -3,12 +3,24 @@
         <!-- Enhanced Main Content -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center mb-6">
-                    <div>
-                        <h2 class="text-xl font-bold text-gray-900">Job Management</h2>
-                        <p class="text-gray-600 mt-1">{{ $jobs->total() }} {{ Str::plural('vacancy', $jobs->total()) }}</p>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <!-- Enhanced Search Bar -->
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900">Job Management</h2>
+                    <p class="text-gray-600 mt-1">{{ $jobs->total() }} {{ Str::plural('vacancy', $jobs->total()) }}</p>
+                    @if(request('search'))
+                        <p class="text-sm text-blue-600 mt-1">
+                            <i class="bi bi-search mr-1"></i>
+                            Searching for: "<strong>{{ request('search') }}</strong>"
+                            @if(request('status'))
+                                in <strong>{{ ucfirst(request('status')) }}</strong> jobs
+                            @endif
+                        </p>
+                    @endif
+                </div>
+                
+                <!-- Search and Filter Form -->
+                <form method="GET" action="{{ route('employer.jobs.manage') }}" class="flex items-center space-x-4" id="searchForm">
+                    <!-- Enhanced Search Bar -->
+                    <div class="flex items-center space-x-2">
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                 <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -16,58 +28,95 @@
                                 </svg>
                             </div>
                             <input type="text" 
-                                   placeholder="Search job titles..." 
+                                   id="searchInput"
+                                   name="search"
+                                   value="{{ request('search') }}"
+                                   placeholder="Search job titles, locations, specializations..." 
                                    class="pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-72 bg-gray-50 focus:bg-white transition-colors shadow-xs">
                         </div>
                         
-                        <!-- Enhanced Filter Dropdown -->
-                        <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open" 
-                                    class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-blue-500 shadow-xs transition-all">
-                                <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z" />
-                                </svg>
-                                All Jobs
+                        <!-- Search Button -->
+                        <button type="submit" 
+                                class="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition-colors font-medium">
+                            <i class="bi bi-search mr-2"></i>
+                            Search
+                        </button>
+                        
+                        <!-- Clear Button -->
+                        @if(request('search'))
+                            <a href="{{ route('employer.jobs.manage', request()->except('search')) }}" 
+                               class="px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors">
+                                <i class="bi bi-x-circle mr-2"></i>
+                                Clear
+                            </a>
+                        @endif
+                    </div>
+                    
+                    <!-- Enhanced Filter Dropdown -->
+                    <x-dropdown align="right" width="48">
+                        <x-slot name="trigger">
+                            <button type="button" class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-xl text-md font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-blue-500 shadow-xs transition-all">
+                                <i class="bi bi-funnel mr-2"></i>
+                                @if(request('status'))
+                                    @switch(request('status'))
+                                        @case('open')
+                                            Active Jobs
+                                            @break
+                                        @case('pending')
+                                            Pending Jobs
+                                            @break
+                                        @case('closed')
+                                            Closed Jobs
+                                            @break
+                                        @default
+                                            All Jobs
+                                    @endswitch
+                                @else
+                                    All Jobs
+                                @endif
                                 <svg class="ml-2 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
-                            <div x-show="open" @click.away="open = false" 
-                                 x-transition:enter="transition ease-out duration-200"
-                                 x-transition:enter-start="opacity-0 scale-95"
-                                 x-transition:enter-end="opacity-100 scale-100"
-                                 x-transition:leave="transition ease-in duration-150"
-                                 x-transition:leave-start="opacity-100 scale-100"
-                                 x-transition:leave-end="opacity-0 scale-95"
-                                 class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 z-10">
-                                <div class="py-2">
-                                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
-                                        <span class="w-2 h-2 bg-gray-400 rounded-full mr-3"></span>
-                                        All Jobs
-                                    </a>
-                                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700">
-                                        <span class="w-2 h-2 bg-green-400 rounded-full mr-3"></span>
-                                        Active
-                                    </a>
-                                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-yellow-50 hover:text-yellow-700">
-                                        <span class="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
-                                        Pending
-                                    </a>
-                                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700">
-                                        <span class="w-2 h-2 bg-red-400 rounded-full mr-3"></span>
-                                        Closed
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @if($jobs->count() > 0)
+                        </x-slot>
+
+                        <x-slot name="content">
+                            <input type="hidden" name="search" value="{{ request('search') }}">
+                            
+                            <button type="submit" name="status" value="" 
+                                    class="w-full text-left px-4 py-2 text-md leading-5 text-gray-700 hover:bg-blue-50 hover:text-blue-700 focus:outline-hidden focus:bg-gray-100 transition duration-150 ease-in-out flex items-center {{ !request('status') ? 'bg-blue-50 text-blue-700 font-medium' : '' }}">
+                                <span class="w-2 h-2 bg-gray-400 rounded-full mr-3"></span>
+                                All Jobs ({{ $statusCounts['all'] ?? 0 }})
+                            </button>
+                            
+                            <button type="submit" name="status" value="open"
+                                    class="w-full text-left px-4 py-2 text-md leading-5 text-gray-700 hover:bg-green-50 hover:text-green-700 focus:outline-hidden focus:bg-gray-100 transition duration-150 ease-in-out flex items-center {{ request('status') === 'open' ? 'bg-green-50 text-green-700 font-medium' : '' }}">
+                                <span class="w-2 h-2 bg-green-400 rounded-full mr-3"></span>
+                                Active ({{ $statusCounts['open'] ?? 0 }})
+                            </button>
+                            
+                            <button type="submit" name="status" value="pending"
+                                    class="w-full text-left px-4 py-2 text-md leading-5 text-gray-700 hover:bg-yellow-50 hover:text-yellow-700 focus:outline-hidden focus:bg-gray-100 transition duration-150 ease-in-out flex items-center {{ request('status') === 'pending' ? 'bg-yellow-50 text-yellow-700 font-medium' : '' }}">
+                                <span class="w-2 h-2 bg-yellow-400 rounded-full mr-3"></span>
+                                Pending ({{ $statusCounts['pending'] ?? 0 }})
+                            </button>
+                            
+                            <button type="submit" name="status" value="closed"
+                                    class="w-full text-left px-4 py-2 text-md leading-5 text-gray-700 hover:bg-red-50 hover:text-red-700 focus:outline-hidden focus:bg-gray-100 transition duration-150 ease-in-out flex items-center {{ request('status') === 'closed' ? 'bg-red-50 text-red-700 font-medium' : '' }}">
+                                <span class="w-2 h-2 bg-red-400 rounded-full mr-3"></span>
+                                Closed ({{ $statusCounts['closed'] ?? 0 }})
+                            </button>
+                        </x-slot>
+                    </x-dropdown>
+                </form>
+            </div>
+            
+            @if($jobs->total() > 0)
                 <div class="flex gap-4 h-screen" style="height: calc(100vh - 220px);" x-data="{ 
                     selectedJob: {{ $jobs->first()->id }}, 
                     activeTab: 'details'
                 }">
-                    <!-- Enhanced Jobs List - Left Side (PREVIOUS LAYOUT) -->
+                    <!-- Enhanced Jobs List - Left Side -->
                     <div class="w-2/5 overflow-y-auto space-y-4 pr-4">
                         @foreach($jobs as $job)
                             <div @click="selectedJob = {{ $job->id }}" 
@@ -102,40 +151,35 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Enhanced Actions Dropdown -->
-                                    <div class="relative ml-4" x-data="{ open: false }">
-                                        <button @click.stop="open = !open" 
-                                                class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
-                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M10 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM10 8.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM11.5 15.5a1.5 1.5 0 10-3 0 1.5 1.5 0 003 0z" />
-                                            </svg>
-                                        </button>
-                                        <div x-show="open" @click.away="open = false" 
-                                                x-transition:enter="transition ease-out duration-200"
-                                                x-transition:enter-start="opacity-0 scale-95"
-                                                x-transition:enter-end="opacity-100 scale-100"
-                                                class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 z-20">
-                                            <div class="py-2">
-                                                <a href="{{ route('employer.jobs.edit', $job->id) }}" 
-                                                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
-                                                    <svg class="w-4 h-4 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    <!-- Enhanced Actions Dropdown using component -->
+                                    <div class="ml-4">
+                                        <x-dropdown align="right" width="48">
+                                            <x-slot name="trigger">
+                                                <button class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+                                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M10 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM10 8.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM11.5 15.5a1.5 1.5 0 10-3 0 1.5 1.5 0 003 0z" />
                                                     </svg>
+                                                </button>
+                                            </x-slot>
+
+                                            <x-slot name="content">
+                                                <x-dropdown-link href="{{ route('employer.jobs.edit', $job->id) }}" class="flex items-center">
+                                                    <i class="bi bi-pencil-square mr-2"></i>
                                                     Edit Job
-                                                </a>
-                                                <form method="POST" action="{{ route('employer.jobs.destroy', $job->id) }}" class="inline w-full">
+                                                </x-dropdown-link>
+                                                
+                                                <form method="POST" action="{{ route('employer.jobs.destroy', $job->id) }}" class="w-full">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" onclick="return confirm('Are you sure you want to delete this job?')" 
-                                                            class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                                                        <svg class="w-4 h-4 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                        </svg>
+                                                    <x-dropdown-link href="#" 
+                                                                   onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this job?')) { this.closest('form').submit(); }"
+                                                                   class="flex items-center text-red-600 hover:bg-red-50 hover:text-red-700 w-full">
+                                                        <i class="bi bi-trash mr-2"></i>
                                                         Delete Job
-                                                    </button>
+                                                    </x-dropdown-link>
                                                 </form>
-                                            </div>
-                                        </div>
+                                            </x-slot>
+                                        </x-dropdown>
                                     </div>
                                 </div>
 
@@ -159,15 +203,6 @@
                                                 Closed
                                             </span>
                                         @endif
-                                    </div>
-                                    
-                                    <!-- Enhanced Applications Count -->
-                                    <div class="flex items-center text-sm text-gray-600 bg-gray-50 px-3 py-1 rounded-full">
-                                        <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                        </svg>
-                                        <span class="font-medium">{{ rand(12, 156) }}</span>
-                                        <span class="ml-1">applications</span>
                                     </div>
                                 </div>
                             </div>
@@ -225,7 +260,7 @@
                                                 <div>
                                                     <h4 class="text-sm font-semibold text-gray-600 mb-1">Salary Range</h4>
                                                     <p class="text-gray-900 font-medium">
-                                                        @if($job->salary_display && ($job->salary_min || $job->salary_max))
+                                                        @if($job->salary_min || $job->salary_max)
                                                             @if($job->salary_min && $job->salary_max)
                                                                 RM {{ number_format($job->salary_min) }} - {{ number_format($job->salary_max) }}
                                                             @elseif($job->salary_min)
@@ -233,8 +268,20 @@
                                                             @elseif($job->salary_max)
                                                                 Up to RM {{ number_format($job->salary_max) }}
                                                             @endif
+                                                            
+                                                            @if(!$job->salary_display)
+                                                                <span class="block items-center text-xs font-medium text-gray-500">
+                                                                    <i class="bi bi-eye-slash mr-1 text-xs"></i>
+                                                                    Hidden from public
+                                                                </span>
+                                                            @else
+                                                                <span class="block items-center text-xs font-medium text-gray-500">
+                                                                    <i class="bi bi-eye mr-1 text-xs"></i>
+                                                                    Public
+                                                                </span>
+                                                            @endif
                                                         @else
-                                                            <span class="text-gray-500">Undisclosed</span>
+                                                            <span class="text-gray-500">Not specified</span>
                                                         @endif
                                                     </p>
                                                 </div>
@@ -303,34 +350,93 @@
                     </div>
                 </div>
 
-                <!-- Enhanced Pagination -->
+                <!-- Pagination -->
                 @if($jobs->hasPages())
                     <div class="mt-8 flex justify-center">
                         <div class="bg-white rounded-xl shadow-xs border border-gray-200 p-2">
-                            {{ $jobs->links() }}
+                            {{ $jobs->appends(request()->query())->links() }}
                         </div>
                     </div>
                 @endif
             @else
                 <!-- Enhanced Empty State -->
                 <div class="bg-white rounded-xl border border-gray-200 text-center py-16">
-                    <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <i class="bi bi-briefcase text-4xl text-gray-400"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">No Job Posts Yet</h3>
-                    <p class="text-gray-500 mb-8 max-w-md mx-auto">Get started by creating your first job posting. Attract top talent and grow your team!</p>
-                    <a 
-                        href="{{ route('employer.jobs.create') }}" 
-                        class="inline-flex items-center px-6 py-3 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-lg"
-                        style="background-color: #006EDC;"
-                        onmouseover="this.style.backgroundColor='#005BB5'"
-                        onmouseout="this.style.backgroundColor='#006EDC'"
-                    >
-                        <i class="bi bi-plus-lg mr-2"></i>
-                        Create Your First Job Post
-                    </a>
+                    @if(request()->hasAny(['search', 'status']))
+                        <!-- No Results Found -->
+                        <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="bi bi-search text-4xl text-gray-400"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">No Jobs Found</h3>
+                        <p class="text-gray-500 mb-8 max-w-md mx-auto">
+                            @if(request('search'))
+                                No jobs match your search for "<strong>{{ request('search') }}</strong>"
+                                @if(request('status'))
+                                    with status "{{ ucfirst(request('status')) }}"
+                                @endif
+                                . Try adjusting your search terms or filters.
+                            @else
+                                No jobs match your current filter criteria. Try adjusting your filters.
+                            @endif
+                        </p>
+                        <div class="flex justify-center space-x-4">
+                            @if(request('search'))
+                                <a href="{{ route('employer.jobs.manage', request()->except('search')) }}" 
+                                   class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                    <i class="bi bi-x-circle mr-2"></i>
+                                    Clear Search
+                                </a>
+                            @endif
+                            <a href="{{ route('employer.jobs.manage') }}" 
+                               class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                <i class="bi bi-arrow-clockwise mr-2"></i>
+                                Clear All Filters
+                            </a>
+                        </div>
+                    @else
+                        <!-- No Jobs at all -->
+                        <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <i class="bi bi-briefcase text-4xl text-gray-400"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">No Job Posts Yet</h3>
+                        <p class="text-gray-500 mb-8 max-w-md mx-auto">Get started by creating your first job posting. Attract top talent and grow your team!</p>
+                        <a 
+                            href="{{ route('employer.jobs.create') }}" 
+                            class="inline-flex items-center px-6 py-3 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-lg"
+                            style="background-color: #006EDC;"
+                            onmouseover="this.style.backgroundColor='#005BB5'"
+                            onmouseout="this.style.backgroundColor='#006EDC'"
+                        >
+                            <i class="bi bi-plus-lg mr-2"></i>
+                            Create Your First Job Post
+                        </a>
+                    @endif
                 </div>
             @endif
         </div>
     </div>
+
+    <script>
+        // Enhanced search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const searchForm = document.getElementById('searchForm');
+            
+            // Submit form on Enter key
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        searchForm.submit();
+                    }
+                });
+            }
+            
+            // Auto-focus search if there's a search term
+            if (searchInput && searchInput.value.trim() !== '') {
+                searchInput.focus();
+                searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
+            }
+        });
+    </script>
+
 </x-employer-layout>

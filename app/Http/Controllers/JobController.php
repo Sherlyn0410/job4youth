@@ -251,33 +251,58 @@ class JobController extends Controller
             $job = Job::active()->with('employer')->findOrFail($id);
             $user = auth()->user();
             
-            // Check if user has already applied
-            if ($user->hasAppliedFor($id)) {
+            // Double check if user has already applied (more robust check)
+            $existingApplication = Application::where('user_id', $user->id)
+                ->where('job_post_id', $id)
+                ->where('status', '!=', 'withdrawn')
+                ->first();
+                
+            if ($existingApplication) {
                 return response()->json([
                     'success' => false,
                     'message' => 'You have already applied for this job'
                 ], 400);
             }
             
-            // Create application
-            $application = Application::create([
-                'employer_id' => $job->employer_id,
-                'user_id' => $user->id,
-                'job_post_id' => $id,
-                'status' => 'submitted',
-                'apply_date' => now(),
-            ]);
+            // Use firstOrCreate to prevent duplicate entries
+            $application = Application::firstOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'job_post_id' => $id,
+                ],
+                [
+                    'employer_id' => $job->employer_id,
+                    'status' => 'submitted',
+                    'apply_date' => now(),
+                ]
+            );
             
-            return response()->json([
-                'success' => true,
-                'message' => "Your application for {$job->title} at {$job->employer->company_name} has been submitted successfully!",
-                'application_id' => $application->id
-            ]);
+            // Check if this was a newly created application
+            if ($application->wasRecentlyCreated) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "Your application for {$job->title} at {$job->employer->company_name} has been submitted successfully!",
+                    'application_id' => $application->id
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You have already applied for this job'
+                ], 400);
+            }
             
         } catch (\Exception $e) {
+            // Handle the specific integrity constraint violation
+            if (strpos($e->getMessage(), '1062 Duplicate entry') !== false) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You have already applied for this job'
+                ], 400);
+            }
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Error submitting application: ' . $e->getMessage()
+                'message' => 'Error submitting application. Please try again.'
             ], 500);
         }
     }

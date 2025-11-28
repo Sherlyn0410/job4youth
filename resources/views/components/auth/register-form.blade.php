@@ -7,7 +7,9 @@
     <!-- Header with Logo and Close Button -->
     <div class="flex items-start justify-between p-6 pb-4">
         <div class="flex flex-col">
-            <x-application-logo class="block h-5 w-auto" />
+            <a href="{{ route('home') }}">
+                <x-application-logo class="block h-5 w-auto" />
+            </a>
         </div>
         <button @click="$dispatch('close-modal', 'register')" class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-hidden focus:ring-2 focus:ring-blue-500">
             <span class="sr-only">Close</span>

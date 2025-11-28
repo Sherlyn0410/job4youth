@@ -71,7 +71,7 @@ class Job extends Model
      */
     public function employer()
     {
-        return $this->belongsTo(Employer::class);
+        return $this->belongsTo(Employer::class, 'employer_id');
     }
 
     /**
@@ -106,6 +106,17 @@ class Job extends Model
     public function incrementViews()
     {
         $this->increment('job_view');
+    }
+
+    /**
+     * Get all skills as a merged array of soft and hard skills.
+     */
+    public function getSkillsAttribute()
+    {
+        $softSkills = is_array($this->soft_skills) ? $this->soft_skills : [];
+        $hardSkills = is_array($this->hard_skills) ? $this->hard_skills : [];
+        
+        return array_merge($softSkills, $hardSkills);
     }
 }
 

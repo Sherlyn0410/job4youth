@@ -5,7 +5,8 @@ class JobsPage {
         this.currentSavedJobId = null;
         this.pageType = 'jobs'; // 'jobs', 'applications', or 'saved-jobs'
         this.applications = []; 
-        this.savedJobs = []; 
+        this.savedJobs = [];
+        this.isSubmitting = false; // Flag to prevent double submissions
         this.init();
     }
 
@@ -716,9 +717,22 @@ class JobsPage {
     applyForJob() {
         if (!this.currentJobId) return;
         
+        // Prevent multiple submissions
+        if (this.isSubmitting) {
+            return;
+        }
+        
         const isAuthenticated = document.querySelector('meta[name="user-authenticated"]')?.getAttribute('content') === 'true';
         
         if (isAuthenticated) {
+            // Set submitting flag and disable button
+            this.isSubmitting = true;
+            const applyButton = document.querySelector('#apply-job-btn');
+            if (applyButton) {
+                applyButton.disabled = true;
+                applyButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Applying...';
+            }
+            
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             
             fetch(`/jobs/${this.currentJobId}/apply`, {
@@ -736,11 +750,23 @@ class JobsPage {
                     window.location.reload();
                 } else {
                     alert(data.message);
+                    // Re-enable button on error
+                    this.isSubmitting = false;
+                    if (applyButton) {
+                        applyButton.disabled = false;
+                        applyButton.innerHTML = '<i class="bi bi-send"></i> Apply Now';
+                    }
                 }
             })
             .catch(error => {
                 console.error('Error applying for job:', error);
                 alert('Error submitting application');
+                // Re-enable button on error
+                this.isSubmitting = false;
+                if (applyButton) {
+                    applyButton.disabled = false;
+                    applyButton.innerHTML = '<i class="bi bi-send"></i> Apply Now';
+                }
             });
         } else {
             this.showLoginModal();
