@@ -47,7 +47,7 @@ class RegisteredUserController extends Controller
 
             Auth::login($user);
 
-            return redirect('/dashboard');
+            return redirect('/')->with('login_success', true);
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Keep the register modal open when there are validation errors
             return redirect()->back()

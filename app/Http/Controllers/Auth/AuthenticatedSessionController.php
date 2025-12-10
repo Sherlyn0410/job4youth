@@ -46,7 +46,7 @@ class AuthenticatedSessionController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'Login successful!',
-                    'redirect' => $request->session()->get('url.intended', '/dashboard')
+                    'redirect' => $request->session()->get('url.intended', '/')
                 ]);
             }
 
@@ -59,8 +59,8 @@ class AuthenticatedSessionController extends Controller
                 return redirect()->route('jobs.index')->with('login_success', true);
             }
 
-            // Default redirect
-            return redirect()->intended($intendedUrl ?: '/dashboard')->with('login_success', true);
+            // Default redirect to home page
+            return redirect()->intended($intendedUrl ?: '/')->with('login_success', true);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             // If this is an AJAX request (from modal), return JSON error response

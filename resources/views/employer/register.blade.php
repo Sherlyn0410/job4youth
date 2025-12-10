@@ -34,9 +34,6 @@
         <div class="max-w-2xl w-full">
             <div class="bg-white rounded-xl shadow-lg p-8">
                 <div class="text-center mb-8">
-                    <div class="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                        <i class="bi bi-building-add text-2xl text-blue-600"></i>
-                    </div>
                     <h2 class="text-3xl font-bold text-gray-900">Register Your Company</h2>
                     <p class="mt-2 text-sm text-gray-600">
                         Start hiring the best talent for your company
@@ -63,7 +60,6 @@
                         <!-- Employer Name -->
                         <div class="md:col-span-2">
                             <label for="employer_name" class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="bi bi-person mr-1"></i>
                                 Your Name (Employer) *
                             </label>
                             <input 
@@ -80,7 +76,6 @@
                         <!-- Company Name -->
                         <div class="md:col-span-2">
                             <label for="company_name" class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="bi bi-building mr-1"></i>
                                 Company Name *
                             </label>
                             <input 
@@ -97,7 +92,6 @@
                         <!-- Email -->
                         <div>
                             <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="bi bi-envelope mr-1"></i>
                                 Email Address *
                             </label>
                             <input 
@@ -114,7 +108,6 @@
                         <!-- Phone -->
                         <div>
                             <label for="phoneNo" class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="bi bi-telephone mr-1"></i>
                                 Phone Number
                             </label>
                             <input 
@@ -130,7 +123,6 @@
                         <!-- Company Size -->
                         <div>
                             <label for="company_size" class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="bi bi-people mr-1"></i>
                                 Company Size
                             </label>
                             <select 
@@ -150,7 +142,6 @@
                         <!-- Company Type -->
                         <div>
                             <label for="company_type" class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="bi bi-briefcase mr-1"></i>
                                 Company Type
                             </label>
                             <select 
@@ -170,7 +161,6 @@
                         <!-- Password -->
                         <div>
                             <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="bi bi-lock mr-1"></i>
                                 Password *
                             </label>
                             <input 
@@ -186,7 +176,6 @@
                         <!-- Confirm Password -->
                         <div>
                             <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="bi bi-lock-fill mr-1"></i>
                                 Confirm Password *
                             </label>
                             <input 
@@ -203,7 +192,6 @@
                     <!-- Company Description -->
                     <div>
                         <label for="company_description" class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="bi bi-card-text mr-1"></i>
                             Company Description
                         </label>
                         <textarea 
@@ -235,7 +223,6 @@
                             type="submit"
                             class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-xs text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                         >
-                            <i class="bi bi-check-circle mr-2"></i>
                             Create Employer Account
                         </button>
                     </div>

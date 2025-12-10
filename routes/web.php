@@ -27,10 +27,7 @@ Route::get('/welcome', function () {
     return view('welcome');
 });
 
-// Protected routes - require authentication
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Dashboard route removed - users now redirect to home page after login
 
 // My Jobs routes (protected)
 Route::middleware('auth')->group(function () {
@@ -109,6 +106,10 @@ Route::prefix('employer')->name('employer.')->group(function () {
             Route::put('/{job}', [App\Http\Controllers\Employer\JobController::class, 'update'])->name('update');
             Route::delete('/{job}', [App\Http\Controllers\Employer\JobController::class, 'destroy'])->name('destroy');
         });
+
+        // Application management routes
+        Route::patch('/applications/{application}/update-status', [App\Http\Controllers\Employer\JobController::class, 'updateApplicationStatus'])->name('applications.updateStatus');
+        Route::delete('/applications/{application}', [App\Http\Controllers\Employer\JobController::class, 'deleteApplication'])->name('applications.delete');
 
         // Company profile routes
         Route::prefix('company')->name('company.')->group(function () {

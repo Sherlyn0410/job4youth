@@ -37,7 +37,8 @@
                         
                         <!-- Search Button -->
                         <button type="submit" 
-                                class="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition-colors font-medium">
+                                class="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition-colors font-medium"
+                                onclick="console.log('Search button clicked, search value:', document.getElementById('searchInput').value);">
                             <i class="bi bi-search mr-2"></i>
                             Search
                         </button>
@@ -229,7 +230,7 @@
 
                         <!-- Content Area -->
                         <div class="h-full flex flex-col">
-                            <div class="flex-1 overflow-y-auto">
+                            <div class="flex-1 overflow-y-auto overflow-x-hidden">
                                 <!-- Job Details Tab -->
                                 <div x-show="activeTab === 'details'" class="p-6">
                                     @foreach($jobs as $job)
@@ -315,16 +316,18 @@
 
                                                 <!-- Skills -->
                                                 @if($job->skills && count($job->skills) > 0)
-                                                    <div>
+                                                    <div class="mb-7">
                                                         <h3 class="text-lg font-semibold text-gray-900 mb-3">Required Skills</h3>
-                                                        <div class="flex flex-wrap gap-2">
-                                                            @foreach($job->skills as $skill)
-                                                                @if($skill && trim($skill))
-                                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 border border-blue-200">
-                                                                        {{ trim($skill) }}
-                                                                    </span>
-                                                                @endif
-                                                            @endforeach
+                                                        <div class="bg-white pb-4">
+                                                            <div class="flex flex-wrap gap-2">
+                                                                @foreach($job->skills as $skill)
+                                                                    @if($skill && trim($skill))
+                                                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                                                            {{ trim($skill) }}
+                                                                        </span>
+                                                                    @endif
+                                                                @endforeach
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 @endif
@@ -335,15 +338,185 @@
 
                                 <!-- Applicants Tab -->
                                 <div x-show="activeTab === 'applicants'" class="p-6">
-                                    <div class="text-center py-16">
-                                        <div class="w-20 h-20 bg-linear-to-br from-blue-100 to-indigo-200 rounded-full flex items-center justify-center mx-auto mb-6">
-                                            <svg class="w-10 h-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                            </svg>
+                                    @foreach($jobs as $job)
+                                        <div x-show="selectedJob === {{ $job->id }}">
+                                            @if($job->applications && $job->applications->count() > 0)
+                                                @php
+                                                    $groupedApplications = $job->applications->groupBy('status');
+                                                    $statusOrder = ['submitted', 'shortlisted', 'accepted', 'rejected'];
+                                                    $statusLabels = [
+                                                        'submitted' => 'Applicants',
+                                                        'shortlisted' => 'Shortlisted Applicants', 
+                                                        'accepted' => 'Accepted Applicants',
+                                                        'rejected' => 'Rejected Applicants'
+                                                    ];
+                                                    $statusColors = [
+                                                        'submitted' => 'bg-blue-50 border-blue-200',
+                                                        'shortlisted' => 'bg-yellow-50 border-yellow-200',
+                                                        'accepted' => 'bg-green-50 border-green-200', 
+                                                        'rejected' => 'bg-red-50 border-red-200'
+                                                    ];
+                                                @endphp
+
+                                                <!-- Overall Header -->
+                                                <div class="mb-6">
+                                                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Application Management</h3>
+                                                    <p class="text-sm text-gray-600">{{ $job->applications->count() }} {{ Str::plural('application', $job->applications->count()) }} total</p>
+                                                </div>
+
+                                                <!-- Status Sections -->
+                                                @foreach($statusOrder as $status)
+                                                    @if(isset($groupedApplications[$status]) && $groupedApplications[$status]->count() > 0)
+                                                        <div class="mb-8">
+                                                            <!-- Status Header -->
+                                                            <div class="flex items-center justify-between mb-4">
+                                                                <h4 class="text-md font-semibold text-gray-800">
+                                                                    {{ $statusLabels[$status] }}
+                                                                    <span class="ml-2 px-3 py-1 text-xs font-medium rounded-full 
+                                                                        @if($status === 'submitted') bg-blue-100 text-blue-800
+                                                                        @elseif($status === 'shortlisted') bg-yellow-100 text-yellow-800
+                                                                        @elseif($status === 'accepted') bg-green-100 text-green-800
+                                                                        @else bg-red-100 text-red-800 @endif">
+                                                                        {{ $groupedApplications[$status]->count() }}
+                                                                    </span>
+                                                                </h4>
+                                                            </div>
+
+                                                            <!-- Applications Table for this status -->
+                                                            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                                                                <div class="overflow-x-auto">
+                                                                    <table class="min-w-full divide-y divide-gray-200">
+                                                                        <thead class="bg-gray-50">
+                                                                            <tr>
+                                                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                                                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resume</th>
+                                                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody class="bg-white divide-y divide-gray-200">
+                                                                            @foreach($groupedApplications[$status] as $application)
+                                                                                <tr class="hover:bg-gray-50">
+                                                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                                                        <div class="text-sm font-medium text-gray-900">
+                                                                                            {{ $application->user->name ?? 'N/A' }}
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                                                        <div class="text-sm text-gray-900">
+                                                                                            {{ $application->user->phone ?? 'N/A' }}
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                                                        <div class="text-sm text-gray-900">
+                                                                                            {{ $application->user->email ?? 'N/A' }}
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                                                        <div class="text-sm text-gray-900">
+                                                                                            {{ $application->created_at->format('M d, Y') }}
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                                                        @if($application->resume_path)
+                                                                                            <a href="{{ Storage::url($application->resume_path) }}" target="_blank" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200">
+                                                                                                <i class="bi bi-file-earmark-pdf mr-1"></i>
+                                                                                                View
+                                                                                            </a>
+                                                                                        @else
+                                                                                            <span class="text-sm text-gray-400">No resume</span>
+                                                                                        @endif
+                                                                                    </td>
+                                                                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                                                        @if($status === 'rejected')
+                                                                                            <!-- Only delete action for rejected applications -->
+                                                                                            <button onclick="deleteApplication({{ $application->id }})" 
+                                                                                                    title="Delete Application"
+                                                                                                    class="text-red-600 hover:text-red-900 hover:bg-red-50 p-2 rounded-lg transition-colors">
+                                                                                                <i class="bi bi-trash text-lg"></i>
+                                                                                            </button>
+                                                                                        @else
+                                                                                            <!-- Full actions dropdown for other statuses -->
+                                                                                            <div class="relative" x-data="{ open: false }">
+                                                                                                <button @click="open = !open" 
+                                                                                                        class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+                                                                                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                                                                        <path d="M10 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM10 8.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM11.5 15.5a1.5 1.5 0 10-3 0 1.5 1.5 0 003 0z" />
+                                                                                                    </svg>
+                                                                                                </button>
+
+                                                                                                <!-- Dropdown Menu -->
+                                                                                                <div x-show="open" 
+                                                                                                     @click.away="open = false"
+                                                                                                     x-transition:enter="transition ease-out duration-100"
+                                                                                                     x-transition:enter-start="transform opacity-0 scale-95"
+                                                                                                     x-transition:enter-end="transform opacity-100 scale-100"
+                                                                                                     x-transition:leave="transition ease-in duration-75"
+                                                                                                     x-transition:leave-start="transform opacity-100 scale-100"
+                                                                                                     x-transition:leave-end="transform opacity-0 scale-95"
+                                                                                                     class="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                                                                                     style="display: none;">
+                                                                                                    
+                                                                                                    @if($status !== 'shortlisted')
+                                                                                                        <!-- Shortlist -->
+                                                                                                        <button onclick="updateApplicationStatus({{ $application->id }}, 'shortlisted'); this.closest('[x-data]').open = false"
+                                                                                                                class="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                                                                            <i class="bi bi-star mr-3 text-yellow-500"></i>
+                                                                                                            Shortlist
+                                                                                                        </button>
+                                                                                                    @endif
+
+                                                                                                    @if($status !== 'accepted')
+                                                                                                        <!-- Accept -->
+                                                                                                        <button onclick="updateApplicationStatus({{ $application->id }}, 'accepted'); this.closest('[x-data]').open = false"
+                                                                                                                class="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                                                                            <i class="bi bi-check-circle mr-3 text-green-500"></i>
+                                                                                                            Accept
+                                                                                                        </button>
+                                                                                                    @endif
+
+                                                                                                    <!-- Reject Applicant -->
+                                                                                                    <button onclick="updateApplicationStatus({{ $application->id }}, 'rejected'); this.closest('[x-data]').open = false"
+                                                                                                            class="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                                                                        <i class="bi bi-x-circle mr-3 text-red-500"></i>
+                                                                                                        Reject
+                                                                                                    </button>
+
+                                                                                                    <!-- Send Email -->
+                                                                                                    <button onclick="sendEmailToApplicant({{ $application->id }}, '{{ $application->user->email ?? '' }}'); this.closest('[x-data]').open = false"
+                                                                                                            class="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                                                                        <i class="bi bi-envelope mr-3 text-blue-500"></i>
+                                                                                                        Send Email
+                                                                                                    </button>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        @endif
+                                                                                    </td>
+                                                                                </tr>
+                                                                            @endforeach
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                            @else
+                                                <!-- No Applicants State -->
+                                                <div class="text-center py-16">
+                                                    <div class="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                                                        <svg class="w-10 h-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 515.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                        </svg>
+                                                    </div>
+                                                    <h3 class="text-xl font-bold text-gray-900 mb-3">No Applicants Yet</h3>
+                                                    <p class="text-gray-500 mb-6 max-w-md mx-auto">Applications will appear here when job seekers apply to this position.</p>
+                                                </div>
+                                            @endif
                                         </div>
-                                        <h3 class="text-xl font-bold text-gray-900 mb-3">No Applicants Yet</h3>
-                                        <p class="text-gray-500 mb-6 max-w-md mx-auto">Applications will appear here when job seekers apply to this position.</p>
-                                    </div>
+                                    @endforeach
                                 </div>
                             </div>
                         </div>
@@ -421,13 +594,34 @@
             const searchInput = document.getElementById('searchInput');
             const searchForm = document.getElementById('searchForm');
             
+            console.log('Search form initialized:', { searchInput, searchForm });
+            
             // Submit form on Enter key
             if (searchInput) {
                 searchInput.addEventListener('keypress', function(e) {
+                    console.log('Key pressed:', e.key, 'Input value:', this.value);
                     if (e.key === 'Enter') {
                         e.preventDefault();
+                        console.log('Submitting form via Enter key');
                         searchForm.submit();
                     }
+                });
+                
+                // Add input event listener for debugging
+                searchInput.addEventListener('input', function(e) {
+                    console.log('Input changed:', this.value);
+                });
+            }
+            
+            // Add click event to search button for debugging
+            const searchButton = searchForm.querySelector('button[type="submit"]');
+            if (searchButton) {
+                searchButton.addEventListener('click', function(e) {
+                    console.log('Search button clicked, form will submit with:', {
+                        search: searchInput.value,
+                        action: searchForm.action,
+                        method: searchForm.method
+                    });
                 });
             }
             
@@ -437,6 +631,201 @@
                 searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
             }
         });
+
+        // Application action functions
+        function updateApplicationStatus(applicationId, status) {
+            console.log('updateApplicationStatus called:', { applicationId, status });
+            
+            // Validate inputs
+            if (!applicationId || !status) {
+                alert('Invalid application or status data.');
+                return;
+            }
+            
+            let actionText = '';
+            let confirmMessage = '';
+            
+            switch(status) {
+                case 'shortlisted':
+                    actionText = 'shortlist';
+                    confirmMessage = 'Are you sure you want to shortlist this applicant?';
+                    break;
+                case 'rejected':
+                    actionText = 'reject';
+                    confirmMessage = 'Are you sure you want to reject this applicant?';
+                    break;
+                case 'accepted':
+                    actionText = 'accept';
+                    confirmMessage = 'Are you sure you want to accept this applicant?';
+                    break;
+                default:
+                    actionText = 'update';
+                    confirmMessage = 'Are you sure you want to update this application?';
+            }
+            
+            console.log('Showing confirmation dialog:', confirmMessage);
+            
+            if (confirm(confirmMessage)) {
+                // Show loading indicator
+                const originalCursor = document.body.style.cursor;
+                document.body.style.cursor = 'wait';
+                
+                try {
+                    // Create a temporary form to submit the request
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/employer/applications/${applicationId}/update-status`;
+                    form.style.display = 'none';
+                    
+                    // Add CSRF token
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                    if (csrfToken && csrfToken.getAttribute('content')) {
+                        const tokenInput = document.createElement('input');
+                        tokenInput.type = 'hidden';
+                        tokenInput.name = '_token';
+                        tokenInput.value = csrfToken.getAttribute('content');
+                        form.appendChild(tokenInput);
+                        console.log('CSRF token added:', csrfToken.getAttribute('content'));
+                    } else {
+                        console.error('CSRF token not found');
+                        alert('Security token not found. Please refresh the page and try again.');
+                        document.body.style.cursor = originalCursor;
+                        return;
+                    }
+                    
+                    // Add method override for PATCH
+                    const methodInput = document.createElement('input');
+                    methodInput.type = 'hidden';
+                    methodInput.name = '_method';
+                    methodInput.value = 'PATCH';
+                    form.appendChild(methodInput);
+                    
+                    // Add status
+                    const statusInput = document.createElement('input');
+                    statusInput.type = 'hidden';
+                    statusInput.name = 'status';
+                    statusInput.value = status;
+                    form.appendChild(statusInput);
+                    
+                    // Submit form
+                    console.log('Submitting form:', {
+                        action: form.action,
+                        method: form.method,
+                        status: status,
+                        applicationId: applicationId
+                    });
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                    
+                } catch (error) {
+                    console.error('Error submitting form:', error);
+                    alert('An error occurred while processing your request. Please try again.');
+                    document.body.style.cursor = originalCursor;
+                }
+            }
+        }
+
+        function sendEmailToApplicant(applicationId, applicantEmail) {
+            console.log('sendEmailToApplicant called:', { applicationId, applicantEmail });
+            
+            // Validate inputs
+            if (!applicationId) {
+                alert('Invalid application data.');
+                return;
+            }
+            
+            if (!applicantEmail || !applicantEmail.includes('@')) {
+                alert('No valid email address found for this applicant.');
+                return;
+            }
+            
+            try {
+                // Create a comprehensive email template
+                const subject = encodeURIComponent('Regarding Your Job Application');
+                const body = encodeURIComponent(`Dear Applicant,
+
+Thank you for your interest in our position and for taking the time to apply.
+
+We have received your application and our hiring team is currently reviewing all submissions. We will be in touch with updates on the status of your application.
+
+If you have any questions in the meantime, please don't hesitate to reach out.
+
+Best regards,
+Hiring Team
+${window.location.origin}`);
+                
+                // Open default email client with pre-filled content
+                const mailtoLink = `mailto:${applicantEmail}?subject=${subject}&body=${body}`;
+                console.log('Opening email client with:', mailtoLink);
+                
+                window.location.href = mailtoLink;
+                
+                // Optional: You could also log this action
+                console.log('Email client opened for application:', applicationId);
+                
+            } catch (error) {
+                console.error('Error opening email client:', error);
+                alert('Error opening email client. Please check your email application settings.');
+            }
+        }
+
+        function deleteApplication(applicationId) {
+            // Validate input
+            if (!applicationId) {
+                alert('Invalid application data.');
+                return;
+            }
+            
+            if (confirm('⚠️ Are you sure you want to permanently delete this application?\n\nThis action cannot be undone and will remove all applicant data.')) {
+                console.log('Deleting application:', applicationId);
+                
+                // Show loading indicator
+                const originalCursor = document.body.style.cursor;
+                document.body.style.cursor = 'wait';
+                
+                try {
+                    // Create a temporary form to submit the delete request
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/employer/applications/${applicationId}`;
+                    form.style.display = 'none';
+                    
+                    // Add CSRF token
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                    if (csrfToken && csrfToken.getAttribute('content')) {
+                        const tokenInput = document.createElement('input');
+                        tokenInput.type = 'hidden';
+                        tokenInput.name = '_token';
+                        tokenInput.value = csrfToken.getAttribute('content');
+                        form.appendChild(tokenInput);
+                        console.log('CSRF token added for delete:', csrfToken.getAttribute('content'));
+                    } else {
+                        console.error('CSRF token not found for delete');
+                        alert('Security token not found. Please refresh the page and try again.');
+                        document.body.style.cursor = originalCursor;
+                        return;
+                    }
+                    
+                    // Add method override for DELETE
+                    const methodInput = document.createElement('input');
+                    methodInput.type = 'hidden';
+                    methodInput.name = '_method';
+                    methodInput.value = 'DELETE';
+                    form.appendChild(methodInput);
+                    
+                    // Submit form
+                    console.log('Submitting delete form for application:', applicationId);
+                    document.body.appendChild(form);
+                    form.submit();
+                    
+                } catch (error) {
+                    console.error('Error submitting delete form:', error);
+                    alert('An error occurred while deleting the application. Please try again.');
+                    document.body.style.cursor = originalCursor;
+                }
+            }
+        }
     </script>
 
 </x-employer-layout>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Job;
+use App\Models\Application;
 
 class JobController extends Controller
 {
@@ -74,6 +75,9 @@ class JobController extends Controller
         
         // Default sorting by latest
         $query->latest();
+        
+        // Eager load applications with users
+        $query->with(['applications.user']);
         
         $jobs = $query->paginate(10);
         
@@ -283,4 +287,53 @@ class JobController extends Controller
     }
 
 
+    /**
+     * Update application status (accept/reject)
+     */
+    public function updateApplicationStatus(Request $request, $applicationId)
+    {
+        $employer = Auth::guard('employer')->user();
+        
+        // Validate the request
+        $request->validate([
+            'status' => 'required|in:accepted,rejected,shortlisted'
+        ]);
+        
+        // Find the application and make sure it belongs to this employer
+        $application = Application::whereHas('job', function($query) use ($employer) {
+            $query->where('employer_id', $employer->id);
+        })->findOrFail($applicationId);
+        
+        // Update the application status
+        $application->update([
+            'status' => $request->status
+        ]);
+        
+        $statusText = match($request->status) {
+            'accepted' => 'accepted',
+            'rejected' => 'rejected',
+            'shortlisted' => 'shortlisted',
+            default => 'updated'
+        };
+        
+        return redirect()->back()->with('success', "Application has been {$statusText} successfully!");
+    }
+
+    /**
+     * Delete application permanently
+     */
+    public function deleteApplication($applicationId)
+    {
+        $employer = Auth::guard('employer')->user();
+        
+        // Find the application and make sure it belongs to this employer
+        $application = Application::whereHas('job', function($query) use ($employer) {
+            $query->where('employer_id', $employer->id);
+        })->findOrFail($applicationId);
+        
+        // Delete the application
+        $application->delete();
+        
+        return redirect()->back()->with('success', "Application has been deleted successfully!");
+    }
 }
