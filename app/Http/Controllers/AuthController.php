@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\Employer;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -64,7 +63,6 @@ class AuthController extends Controller
             'company_type' => 'nullable|string|max:50',
             'company_description' => 'nullable|string|max:1000',
             'password' => 'required|string|min:8|confirmed',
-            'terms' => 'required|accepted',
         ]);
 
         $employer = Employer::create([

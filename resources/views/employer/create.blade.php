@@ -8,7 +8,7 @@
                         {{ isset($job) ? 'Edit Job' : 'Post a Job' }}
                     </h1>
                     @if(isset($job))
-                    <a href="{{ route('employer.jobs.manage') }}" 
+                    <a href="{{ route('employer.manage') }}" 
                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
                         <i class="bi bi-arrow-left mr-2"></i>
                         Back to Jobs
@@ -17,21 +17,18 @@
                 </div>
 
                 <form method="POST" 
-                      action="{{ isset($job) ? route('employer.jobs.update', $job->id) : route('employer.jobs.store') }}" 
-                      class="px-6 pb-6 space-y-6"
+                      action="{{ isset($job) ? route('employer.update', $job->id) : route('employer.store') }}" 
+                      class="px-6 py-6 space-y-6"
                       x-data="{ 
-                          isSubmitting: false,
                           // Pre-fill skills for editing
                           softSkills: {{ isset($job) && $job->soft_skills ? json_encode($job->soft_skills) : '[]' }},
                           hardSkills: {{ isset($job) && $job->hard_skills ? json_encode($job->hard_skills) : '[]' }}
                       }"
-                      @submit="isSubmitting = true">
                     @csrf
                     @if(isset($job))
                         @method('PUT')
                     @endif
 
-                    <!-- Display Validation Errors -->
                     @if ($errors->any())
                         <div class="bg-red-50 border border-red-200 rounded-lg p-4">
                             <div class="flex">
@@ -429,26 +426,15 @@
 
                     <!-- Submit Button -->
                     <div class="flex justify-end gap-4 pt-6 border-t border-gray-200">
-                        <a href="{{ route('employer.jobs.manage') }}" 
-                           class="px-6 py-3 border border-gray-300 rounded-lg font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
-                            Cancel
-                        </a>
+                        <x-secondary-button>
+                            <a href="{{ route('employer.manage') }}">
+                                Cancel
+                            </a>
+                        </x-secondary-button>
                         
-                        <button type="submit" 
-                                :disabled="isSubmitting"
-                                :class="isSubmitting ? 'opacity-50 cursor-not-allowed' : ''"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-base font-medium transition-colors flex items-center gap-2">
-                            <span x-show="!isSubmitting">
-                                {{ isset($job) ? 'Save Changes' : 'Post Job' }}
-                            </span>
-                            <span x-show="isSubmitting" class="flex items-center">
-                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                {{ isset($job) ? 'Saving Changes...' : 'Posting Job...' }}
-                            </span>
-                        </button>
+                        <x-primary-button type="submit" class="px-8 py-3 text-base">
+                            {{ isset($job) ? 'Save Changes' : 'Post Job' }}
+                        </x-primary-button>
                     </div>
                 </form>
             </div>

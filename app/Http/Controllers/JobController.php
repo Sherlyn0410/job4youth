@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Job;
 use App\Models\Application;
 use App\Models\SavedJob;
+use Auth;
 
 class JobController extends Controller
 {
@@ -430,5 +431,66 @@ class JobController extends Controller
         });
         
         return view('saved-jobs', compact('savedJobs'));
+    }
+
+    // Add this method for employer job management
+    public function manage()
+    {
+        $jobs = Job::where('employer_id', Auth::id())
+            ->with(['applications' => function($query) {
+                $query->select('job_post_id', \DB::raw('count(*) as applications_count'))
+                      ->groupBy('job_post_id');
+            }])
+            ->withCount('applications')
+            ->latest()
+            ->paginate(10);
+            
+        return view('employer.manage', compact('jobs'));
+    }
+
+    // Add this method for creating new jobs (employer side)
+    public function create()
+    {
+        $jobTypes = [
+            'full-time' => 'Full Time',
+            'part-time' => 'Part Time', 
+            'contract' => 'Contract',
+            'internship' => 'Internship'
+        ];
+        
+        $experienceLevels = [
+            'entry' => 'Entry Level',
+            'mid' => 'Mid Level',
+            'senior' => 'Senior Level'
+        ];
+        
+        $specializations = [
+            'software-development' => 'Software Development',
+            'web-development' => 'Web Development',
+            'mobile-development' => 'Mobile Development',
+            'data-science' => 'Data Science',
+            'cybersecurity' => 'Cybersecurity',
+            'ui-ux-design' => 'UI/UX Design',
+            'digital-marketing' => 'Digital Marketing',
+            'project-management' => 'Project Management',
+            'business-analysis' => 'Business Analysis',
+            'quality-assurance' => 'Quality Assurance',
+            'devops' => 'DevOps',
+            'database-administration' => 'Database Administration',
+            'network-administration' => 'Network Administration',
+            'technical-writing' => 'Technical Writing',
+            'customer-support' => 'Customer Support'
+        ];
+        
+        $educationLevels = [
+            'high-school' => 'High School',
+            'diploma' => 'Diploma',
+            'bachelor' => 'Bachelor\'s Degree',
+            'master' => 'Master\'s Degree',
+            'phd' => 'PhD',
+            'certification' => 'Professional Certification'
+        ];
+        
+        return view('employer.create', compact('jobTypes', 'experienceLevels', 'specializations', 'educationLevels'));
     }
 }

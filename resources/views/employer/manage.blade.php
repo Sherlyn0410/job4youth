@@ -6,54 +6,11 @@
                 <div>
                     <h2 class="text-xl font-bold text-gray-900">Job Management</h2>
                     <p class="text-gray-600 mt-1">{{ $jobs->total() }} {{ Str::plural('vacancy', $jobs->total()) }}</p>
-                    @if(request('search'))
-                        <p class="text-sm text-blue-600 mt-1">
-                            <i class="bi bi-search mr-1"></i>
-                            Searching for: "<strong>{{ request('search') }}</strong>"
-                            @if(request('status'))
-                                in <strong>{{ ucfirst(request('status')) }}</strong> jobs
-                            @endif
-                        </p>
-                    @endif
                 </div>
                 
-                <!-- Search and Filter Form -->
-                <form method="GET" action="{{ route('employer.jobs.manage') }}" class="flex items-center space-x-4" id="searchForm">
-                    <!-- Enhanced Search Bar -->
-                    <div class="flex items-center space-x-2">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            </div>
-                            <input type="text" 
-                                   id="searchInput"
-                                   name="search"
-                                   value="{{ request('search') }}"
-                                   placeholder="Search job titles, locations, specializations..." 
-                                   class="pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-72 bg-gray-50 focus:bg-white transition-colors shadow-xs">
-                        </div>
-                        
-                        <!-- Search Button -->
-                        <button type="submit" 
-                                class="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition-colors font-medium"
-                                onclick="console.log('Search button clicked, search value:', document.getElementById('searchInput').value);">
-                            <i class="bi bi-search mr-2"></i>
-                            Search
-                        </button>
-                        
-                        <!-- Clear Button -->
-                        @if(request('search'))
-                            <a href="{{ route('employer.jobs.manage', request()->except('search')) }}" 
-                               class="px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors">
-                                <i class="bi bi-x-circle mr-2"></i>
-                                Clear
-                            </a>
-                        @endif
-                    </div>
-                    
-                    <!-- Enhanced Filter Dropdown -->
+                <!-- Filter Form -->
+                <form method="GET" action="{{ route('employer.jobs.manage') }}" class="flex items-center space-x-4">
+                    <!-- Filter Dropdown -->
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
                             <button type="button" class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-xl text-md font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-blue-500 shadow-xs transition-all">
@@ -82,8 +39,6 @@
                         </x-slot>
 
                         <x-slot name="content">
-                            <input type="hidden" name="search" value="{{ request('search') }}">
-                            
                             <button type="submit" name="status" value="" 
                                     class="w-full text-left px-4 py-2 text-md leading-5 text-gray-700 hover:bg-blue-50 hover:text-blue-700 focus:outline-hidden focus:bg-gray-100 transition duration-150 ease-in-out flex items-center {{ !request('status') ? 'bg-blue-50 text-blue-700 font-medium' : '' }}">
                                 <span class="w-2 h-2 bg-gray-400 rounded-full mr-3"></span>
@@ -534,31 +489,16 @@
             @else
                 <!-- Enhanced Empty State -->
                 <div class="bg-white rounded-xl border border-gray-200 text-center py-16">
-                    @if(request()->hasAny(['search', 'status']))
+                    @if(request('status'))
                         <!-- No Results Found -->
                         <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <i class="bi bi-search text-4xl text-gray-400"></i>
+                            <i class="bi bi-funnel text-4xl text-gray-400"></i>
                         </div>
                         <h3 class="text-xl font-bold text-gray-900 mb-4">No Jobs Found</h3>
                         <p class="text-gray-500 mb-8 max-w-md mx-auto">
-                            @if(request('search'))
-                                No jobs match your search for "<strong>{{ request('search') }}</strong>"
-                                @if(request('status'))
-                                    with status "{{ ucfirst(request('status')) }}"
-                                @endif
-                                . Try adjusting your search terms or filters.
-                            @else
-                                No jobs match your current filter criteria. Try adjusting your filters.
-                            @endif
+                            No jobs match your current filter criteria. Try adjusting your filters.
                         </p>
                         <div class="flex justify-center space-x-4">
-                            @if(request('search'))
-                                <a href="{{ route('employer.jobs.manage', request()->except('search')) }}" 
-                                   class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
-                                    <i class="bi bi-x-circle mr-2"></i>
-                                    Clear Search
-                                </a>
-                            @endif
                             <a href="{{ route('employer.jobs.manage') }}" 
                                class="inline-flex items-center px-6 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
                                 <i class="bi bi-arrow-clockwise mr-2"></i>
@@ -589,49 +529,6 @@
     </div>
 
     <script>
-        // Enhanced search functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchInput');
-            const searchForm = document.getElementById('searchForm');
-            
-            console.log('Search form initialized:', { searchInput, searchForm });
-            
-            // Submit form on Enter key
-            if (searchInput) {
-                searchInput.addEventListener('keypress', function(e) {
-                    console.log('Key pressed:', e.key, 'Input value:', this.value);
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        console.log('Submitting form via Enter key');
-                        searchForm.submit();
-                    }
-                });
-                
-                // Add input event listener for debugging
-                searchInput.addEventListener('input', function(e) {
-                    console.log('Input changed:', this.value);
-                });
-            }
-            
-            // Add click event to search button for debugging
-            const searchButton = searchForm.querySelector('button[type="submit"]');
-            if (searchButton) {
-                searchButton.addEventListener('click', function(e) {
-                    console.log('Search button clicked, form will submit with:', {
-                        search: searchInput.value,
-                        action: searchForm.action,
-                        method: searchForm.method
-                    });
-                });
-            }
-            
-            // Auto-focus search if there's a search term
-            if (searchInput && searchInput.value.trim() !== '') {
-                searchInput.focus();
-                searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
-            }
-        });
-
         // Application action functions
         function updateApplicationStatus(applicationId, status) {
             console.log('updateApplicationStatus called:', { applicationId, status });

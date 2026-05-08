@@ -4,6 +4,11 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\UserController;
+
 use Illuminate\Support\Facades\Route;
 
 
@@ -81,35 +86,35 @@ Route::get('/learning-activities', [CourseController::class, 'learningActivities
 // Update the employer routes section
 Route::prefix('employer')->name('employer.')->group(function () {
     // These routes should NOT have any auth middleware
-    Route::get('/login', [App\Http\Controllers\Employer\AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [App\Http\Controllers\Employer\AuthController::class, 'login'])->name('login.submit');
-    Route::get('/register', [App\Http\Controllers\Employer\AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [App\Http\Controllers\Employer\AuthController::class, 'register'])->name('register.submit');
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
 
     // Logout route (only for authenticated employers)
-    Route::post('/logout', [App\Http\Controllers\Employer\AuthController::class, 'logout'])
+    Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout')
         ->middleware('auth:employer');
 
     // Protected employer routes
     Route::middleware('auth:employer')->group(function () {
-        Route::get('/dashboard', [App\Http\Controllers\Employer\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Jobs routes
         Route::prefix('jobs')->name('jobs.')->group(function () {
-            Route::get('/', [App\Http\Controllers\Employer\JobController::class, 'manage'])->name('manage');
-            Route::get('/debug-search', [App\Http\Controllers\Employer\JobController::class, 'debugSearch'])->name('debug');
-            Route::get('/create', [App\Http\Controllers\Employer\JobController::class, 'create'])->name('create');
-            Route::post('/', [App\Http\Controllers\Employer\JobController::class, 'store'])->name('store');
-            Route::get('/{job}', [App\Http\Controllers\Employer\JobController::class, 'show'])->name('show');
-            Route::get('/{job}/edit', [App\Http\Controllers\Employer\JobController::class, 'edit'])->name('edit');
-            Route::put('/{job}', [App\Http\Controllers\Employer\JobController::class, 'update'])->name('update');
-            Route::delete('/{job}', [App\Http\Controllers\Employer\JobController::class, 'destroy'])->name('destroy');
+            Route::get('/', [JobController::class, 'manage'])->name('manage');
+            Route::get('/debug-search', [JobController::class, 'debugSearch'])->name('debug');
+            Route::get('/create', [JobController::class, 'create'])->name('create');
+            Route::post('/', [JobController::class, 'store'])->name('store');
+            Route::get('/{job}', [JobController::class, 'show'])->name('show');
+            Route::get('/{job}/edit', [JobController::class, 'edit'])->name('edit');
+            Route::put('/{job}', [JobController::class, 'update'])->name('update');
+            Route::delete('/{job}', [JobController::class, 'destroy'])->name('destroy');
         });
 
         // Application management routes
-        Route::patch('/applications/{application}/update-status', [App\Http\Controllers\Employer\JobController::class, 'updateApplicationStatus'])->name('applications.updateStatus');
-        Route::delete('/applications/{application}', [App\Http\Controllers\Employer\JobController::class, 'deleteApplication'])->name('applications.delete');
+        Route::patch('/applications/{application}/update-status', [JobController::class, 'updateApplicationStatus'])->name('applications.updateStatus');
+        Route::delete('/applications/{application}', [JobController::class, 'deleteApplication'])->name('applications.delete');
 
         // Company profile routes
         Route::prefix('company')->name('company.')->group(function () {
